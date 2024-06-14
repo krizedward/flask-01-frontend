@@ -1,0 +1,974 @@
+<!-- index.html -->
+{% extends "base.html" %}
+{% block title %}Index - Commission{% endblock %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<ul class="flashes">
+  {% for category, message in messages %}
+  <li class="{{ category }}">{{ message }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+
+{% block breadcrumb %}
+<section class="content-header">
+  <h1>
+    Commission
+    <small>index pages</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li class="active">Index</li>
+  </ol>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<section class="content">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-primary">
+        <div class="box-header with-border">
+          <div class="box-title">
+            <select id="data1_length" class="form-control input-sm" onchange="changeTableLength()">
+              <!-- <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option> -->
+              <option value="1">1</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+
+          <div class="box-tools" style="margin-top: 5px;">
+            <ul class="pagination pagination-sm no-margin pull-right">
+              <li><a href="#" data-toggle="modal" data-target="#modal-filter">Filter</a></li>
+              <li><a href="#" data-toggle="modal" data-target="#modal-sort">Sort</a></li>
+            </ul>
+          </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table id="commissionTable" class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Commission Code</th>
+                <th>Commission Name</th>
+                <th>Commission Note</th>
+                <th>Is Active</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="commissionData">
+              <!-- Data will be displayed here -->
+            </tbody>
+          </table>
+        </div>
+        <!-- box-body -->
+        <div class="box-footer clearfix">
+          <div id="tota"></div>
+          <ul class="pagination pagination-sm no-margin pull-right">
+            <li><a href="#" id="previousPage">Previous</a></li>
+            <li><a href="#" class="pageNumber">1</a></li>
+            <li><a href="#" class="pageNumber">2</a></li>
+            <li><a href="#" class="pageNumber">3</a></li>
+            <li><a href="#" id="nextPage">Next</a></li>
+          </ul>
+        </div>
+        <!-- box-footer -->
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="row">
+    <div class="col-12">
+      <div id="result"></div>
+    </div>
+  </div> -->
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-primary">
+        <div class="box-header with-border">
+          <div class="box-title">
+            <select id="data1_length" class="form-control input-sm" onchange="changeTableLength()">
+              <!-- <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option> -->
+              <option value="1">1</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+
+          <div class="box-tools" style="margin-top: 5px;">
+            <ul class="pagination pagination-sm no-margin pull-right">
+              <li><a href="#" data-toggle="modal" data-target="#modal-filter">Filter</a></li>
+              <li><a href="#" data-toggle="modal" data-target="#modal-sort">Sort</a></li>
+            </ul>
+          </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <table class="table table-bordered">
+            <thead>
+              <tr id="person-list">
+                <th>Code</th>
+                <th>Name</th>
+                <th>Note</th>
+                <th>Active</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+
+            </tbody>
+            <tbody>
+              {% for data in commissions %}
+              <tr>
+                <td>{{ data.commission_code }}</td>
+                <td>{{ data.commission_name }}</td>
+                <td>{{ data.commission_note }}</td>
+                <td>{{ data.is_active }}</td>
+                <td>
+                  <a href="/commissions/{{ data.commission_code }}/edit" class="btn btn-warning stretched-link">Edit</a>
+                  <!-- <a href="/commissions/{{ data.commission_code }}/destroy" class="btn btn-danger stretched-link">Delete</a> -->
+                  <a href="#" class="btn btn-danger stretched-link"
+                    onclick="confirmAlert('{{ data.commission_code }}')">Delete</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer clearfix">
+          <ul class="pagination pagination-sm no-margin pull-right">
+            <li><a href="#">Previous</a></li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">Next</a></li>
+          </ul>
+        </div>
+      </div>
+      <!-- /.box -->
+    </div>
+
+    <!-- <div class="col-xs-12">
+          <div class="box">
+            <div class="box-body">
+              <table id="data1" class="table table-bordered table-striped">
+                  
+                <thead>
+                  <tr id="person-list">
+                      <th>Commission Code</th>
+                      <th>Commission Name</th>
+                      <th>Commission Note</th>
+                      <th>Active</th>
+                      <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for data in commissions %}
+                      <tr>
+                          <td>{{ data.commission_code }}</td>
+                          <td>{{ data.commission_name }}</td>
+                          <td>{{ data.commission_note }}</td>
+                          <td>{{ data.is_active }}</td>
+                          <td>
+                              <a href="/commissions/{{ data.commission_code }}/edit" class="btn btn-warning stretched-link">Edit</a>
+                              <a href="/commissions/{{ data.commission_code }}/destroy" class="btn btn-danger stretched-link">Delete</a>
+                              <a href="#" class="btn btn-danger stretched-link" onclick="confirmAlert('{{ data.commission_code }}')">Delete</a>
+                          </td>
+                      </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div> -->
+    <!-- /.col -->
+  </div>
+  <!-- /.row -->
+</section>
+<table id="example2" class="table table-bordered table-hover"></table>
+
+<div class="modal fade" id="modal-filter">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
+        <a href="#" class="btn btn-primary" id="addFormButton">
+          <i class="fa fa-plus"></i>
+        </a>
+      </div>
+      <form action="/commissions" role="form" method="POST">
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="filter_type">Filter Type</label>
+                <select id="logicOperator" class="form-control logic-operator" name="filter_type">
+                  <option value="none"></option>
+                  <option value="AND">AND</option>
+                  <option value="OR">OR</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Operator</th>
+                    <th>Value 1</th>
+                    <th>Value 2</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="formContainer">
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+          <!-- row -->
+        </div>
+        <div class="modal-footer">
+          <!-- <button type="submit" class="btn btn-success">Submit Fliter</button> -->
+          <button class="btn btn-success" id="updateFilterLocalStorage">Simpan ke Filter Storage</button>
+        </div>
+
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div class="modal fade" id="modal-sort">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <a href="#" class="btn btn-primary" id="addFormSortButton">
+          <i class="fa fa-plus"></i>
+        </a>
+      </div>
+      <form action="/commissions" method="POST">
+        <div class="modal-body">
+          <div class="row">
+
+            <div class="col-md-12">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Sort</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="formSortContainer">
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+          <!-- row -->
+        </div>
+        <div class="modal-footer">
+          <!-- <button type="submit" class="btn btn-success">Submit Sort</button> -->
+          <button class="btn btn-success" id="updateLocalStorageButton">Simpan ke localStorage</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- /.content -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Function untuk menangani klik pada nomor halaman
+  function handlePageClick(event) {
+    event.preventDefault();
+    var pageNumber = event.target.textContent;
+    console.log("Page clicked:", pageNumber);
+    // Lakukan sesuatu dengan nomor halaman yang diklik, seperti memuat data yang sesuai
+  }
+  // Tambahkan event listener untuk setiap nomor halaman
+  var pageNumberLinks = document.querySelectorAll('.pageNumber');
+  pageNumberLinks.forEach(function(link) {
+    link.addEventListener('click', handlePageClick);
+  });
+  // Function untuk menangani klik pada tombol "Previous"
+  document.getElementById('previousPage').addEventListener('click', function(event) {
+    event.preventDefault();
+    console.log("Previous page clicked");
+    // Lakukan sesuatu ketika tombol "Previous" diklik, seperti navigasi ke halaman sebelumnya
+  });
+  // Function untuk menangani klik pada tombol "Next"
+  document.getElementById('nextPage').addEventListener('click', function(event) {
+    event.preventDefault();
+    console.log("Next page clicked");
+    // Lakukan sesuatu ketika tombol "Next" diklik, seperti navigasi ke halaman berikutnya
+  });
+</script>
+
+<script>
+  function tableDataFetch(data) {
+    var commissionData = document.getElementById("commissionData"); // id html table
+    commissionData.innerHTML = "";
+    data.forEach(item => {
+      var commissionCode = item.commission_code;
+      var commissionName = item.commission_name;
+      var commissionNote = item.commission_note;
+      var isActive = item.is_active;
+      var newRow = document.createElement("tr");
+      var codeCell = document.createElement("td");
+      codeCell.textContent = commissionCode;
+      newRow.appendChild(codeCell);
+      var nameCell = document.createElement("td");
+      nameCell.textContent = commissionName;
+      newRow.appendChild(nameCell);
+      var noteCell = document.createElement("td");
+      noteCell.textContent = commissionNote;
+      newRow.appendChild(noteCell);
+      var activeCell = document.createElement("td");
+      activeCell.textContent = isActive;
+      newRow.appendChild(activeCell);
+      var actionCell = document.createElement("td");
+      var editLink = document.createElement("a");
+      editLink.href = "/commissions/" + commissionCode + "/edit";
+      editLink.className = "btn btn-warning stretched-link";
+      editLink.textContent = "Edit";
+      actionCell.appendChild(editLink);
+      var deleteLink = document.createElement("a");
+      deleteLink.href = "#";
+      deleteLink.className = "btn btn-danger stretched-link";
+      deleteLink.textContent = "Delete";
+      deleteLink.onclick = function() {
+        confirmAlert(commissionCode);
+      };
+      actionCell.appendChild(deleteLink);
+      newRow.appendChild(actionCell);
+      commissionData.appendChild(newRow);
+    });
+  }
+</script>
+<!-- fetch data tabel -->
+
+<script>
+  const token = "{{ token }}";
+  console.log("Token from Flask:", token);
+  // Panggil fungsi saat dokumen sudah selesai dimuat
+  document.addEventListener('DOMContentLoaded', fetchDataFromLocalStorageAndRender);
+  // document.addEventListener('DOMContentLoaded', function() {
+  //     var storedData = localStorage.getItem('parameterArray');
+  //     var tableBody = document.getElementById('tableBody');
+  //     if (storedData) {
+  //         var requestData = JSON.parse(storedData);
+  //         fetch('/dummy-commissions', {
+  //             method: 'POST',
+  //             headers: {
+  //                 'Content-Type': 'application/json'
+  //             },
+  //             body: JSON.stringify(requestData)
+  //         })
+  //         .then(response => response.json())
+  //         .then(data => {
+  //             data.forEach(item => {
+  //                 var row = document.createElement('tr');
+  //                 row.innerHTML = `
+  //                     <td>${item.commission_code}</td>
+  //                     <td>${item.commission_name}</td>
+  //                     <td>${item.commission_note}</td>
+  //                     <td>${item.is_active}</td>
+  //                 `;
+  //                 tableBody.appendChild(row);
+  //             });
+  //             // Menyimpan array input ke dalam localStorage
+  //             localStorage.setItem('dataArray', JSON.stringify(data));
+  //         })
+  //         .catch(error => console.error('Error fetching data:', error));
+  //     } else {
+  //         console.error('Data tidak ditemukan di localStorage');
+  //     }
+  // });
+  function fetchDataFromLocalStorageAndRender() {
+    var storedData = localStorage.getItem('parameterArray');
+    var tableBody = document.getElementById('tableBody');
+    if (storedData) {
+      var requestData = JSON.parse(storedData);
+      fetch('/dummy-commissions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(item => {
+            var row = document.createElement('tr');
+            row.innerHTML = `
+                          <td>${item.commission_code}</td>
+                          <td>${item.commission_name}</td>
+                          <td>${item.commission_note}</td>
+                          <td>${item.is_active}</td>
+                          <td>${item.is_active}</td>
+                      `;
+            tableBody.appendChild(row);
+          });
+          // Menyimpan array input ke dalam localStorage
+          localStorage.setItem('dataArray', JSON.stringify(data));
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    } else {
+      console.error('Data tidak ditemukan di localStorage');
+    }
+  }
+  // proses lama
+  var storedData = localStorage.getItem('parameterArray');
+  // Periksa apakah ada data yang tersimpan di localStorage
+  if (storedData) {
+    // Ubah data dari string JSON ke objek JavaScript
+    var requestData = JSON.parse(storedData);
+    fetch('/dummy-commissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+      })
+      .then(response => response.json())
+      // .then(data => console.log(data))
+      .then(data => {
+        // Menampilkan data di dalam div dengan id "result"
+        var resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = ""; // Mengosongkan isi div sebelumnya
+        resultDiv.innerHTML = JSON.stringify(data); // Menampilkan data JSON
+        // Menyimpan array input ke dalam localStorage
+        localStorage.setItem('dataArray', JSON.stringify(data));
+        tableDataFetch(data);
+      })
+      .catch(error => console.error('Error:', error));
+  } else {
+    console.error('Data tidak ditemukan di localStorage');
+  }
+</script>
+<!-- umum -->
+
+<script>
+  document.getElementById('logicOperator').addEventListener('change', function() {
+    var selectedOperator = this.value;
+    console.log('Operator logika yang dipilih:', selectedOperator);
+  });
+</script>
+
+<script>
+  function changeTableLength() {
+    var select = document.getElementById("data1_length");
+    var length = select.options[select.selectedIndex].value;
+    // Di sini Anda bisa menambahkan kode untuk menangani perubahan panjang tabel
+    console.log("Panjang tabel yang dipilih: " + length);
+    // get localStorage
+    var storedData = localStorage.getItem('parameterArray');
+    storedData = storedData ? JSON.parse(storedData) : [];
+    // Objek data yang akan dikirim ke API
+    var data = {
+      'limit': length,
+      'page': 1,
+      'data': storedData.data
+    };
+    // data.data = 'baru';
+    // data.data = {
+    //   sorts: [
+    //     {
+    //       "field": "commission_code",
+    //       "order": "ASC"
+    //     }
+    //   ]
+    // };
+    // data.data.filters = {
+    //   "search": "commission_code",
+    //   "operator": "is equal to",
+    //   "value1": "K1",
+    //   "value2": "K1"
+    // };
+    // Menambahkan nilai kedua ke dalam obj.data tanpa menghapus yang sebelumnya
+    // data.data.filter_type = 'AND';
+    // data.sorts = {
+    //   "field": "commission_code",
+    //   "order": "ASC"
+    // };
+    localStorage.setItem('parameterArray', JSON.stringify(data));
+    var parameterData = JSON.parse(localStorage.getItem('parameterArray'));
+    // berhasil
+    fetch('/dummy-commissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(parameterData)
+      })
+      .then(response => response.json())
+      // .then(data => console.log(data))
+      .then(data => {
+        tableDataFetch(data);
+        // Menampilkan data di dalam div dengan id "result"
+        var resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = ""; // Mengosongkan isi div sebelumnya
+        // resultDiv.innerHTML = JSON.stringify(data); // Menampilkan data JSON
+        // Loop foreach untuk menampilkan data JSON
+        data.forEach(item => {
+          // resultDiv.innerHTML += JSON.stringify(item) + "<br>"; // Menampilkan data JSON
+          var commissionCode = item.commission_code;
+          var commissionName = item.commission_name;
+          var commissionNote = item.commission_note;
+          var isActive = item.is_active;
+          // Menampilkan data di dalam div
+          resultDiv.innerHTML += "Commission Code: " + commissionCode + "<br>";
+          resultDiv.innerHTML += "Commission Name: " + commissionName + "<br>";
+          resultDiv.innerHTML += "Commission Note: " + commissionNote + "<br>";
+          resultDiv.innerHTML += "Is Active: " + isActive + "<br><br>";
+        });
+        // Menyimpan array input ke dalam localStorage
+        localStorage.setItem('dataArray', JSON.stringify(data));
+        document.addEventListener('DOMContentLoaded', function() {
+          var tableBody = document.getElementById("tableBody");
+          tableBody.forEach(item => {
+            var row = document.createElement('tr');
+            row.innerHTML = `
+                           <td>${item.commission_code}</td>
+                           <td>${item.commission_name}</td>
+                           <td>${item.commission_note}</td>
+                           <td>${item.is_active}</td>
+                       `;
+            tableBody.appendChild(row);
+          });
+        });
+        // var tableBody = document.getElementById('tableBody');
+        // data.forEach(item => {
+        //       var row = document.createElement('tr');
+        //       row.innerHTML = `
+        //           <td>${item.commission_code}</td>
+        //           <td>${item.commission_name}</td>
+        //           <td>${item.commission_note}</td>
+        //           <td>${item.is_active}</td>
+        //       `;
+        //       tableBody.appendChild(row);
+        //   });
+      })
+      .catch(error => console.error('Error:', error));
+    // Kirim permintaan ke API
+    // fetch('URL_API_ANDA', requestOptions)
+    //     .then(response => response.json())
+    //     .then(data => console.log(data))
+    //     .catch(error => console.log('Error:', error));
+  }
+</script>
+<!-- changeTableLength -->
+
+<script>
+  document.getElementById('addFormButton').addEventListener('click', function() {
+    // Buat elemen form baru
+    // var newForm = document.createElement('div');
+    // newForm.classList.add('form-item');
+    var newRow = document.createElement('tr');
+    // Tambahkan input field ke dalam form baru
+    newRow.innerHTML = `
+          <td>
+            <div class="form-group">
+              <select class="form-control search-select" name="search_filter">
+                  <option value="none"> </option>
+                  <option value="commission_code">Commission Code</option>
+                  <option value="commission_name">Commission Name</option>
+                  <option value="commission_note">Commission Note</option>
+                  <option value="is_active">Is Active</option>
+                  <option value="create_by">Created By</option>
+                  <option value="create_date">Create Date</option>
+                  <option value="update_by">Updated By</option>
+                  <option value="update_date">Update Date</option>
+              </select>
+            </div>
+          </td>
+          <td>
+            <div class="form-group">
+              <select id="operator" class="form-control operator-select" name="operator">
+                  <option value="none"> </option>
+                  <option value="is equal to">is equal to</option>
+                  <option value="is not equal to">is not equal to</option>
+                  <option value="is less than">is less than</option>
+                  <option value="is less than or equal to">is less than or equal to</option>
+                  <option value="is greater than">is greater than</option>
+                  <option value="is greater than or equal to">is greater than or equal to</option>
+                  <option value="contains">contains</option>
+                  <option value="does not contain">does not contain</option>
+                  <option value="is between">is between</option>
+                  <option value="is not between">is not between</option>
+              </select>
+            </div>
+          </td>
+          <td>
+            <div class="form-group">
+              <input name="value1" type="text" class="form-control" placeholder="Enter">
+            </div>
+          </td>
+          <td>
+            <div class="form-group">
+              <input name="value2" type="text" class="form-control" placeholder="Enter">
+            </div>
+          </td>
+          <td>
+            <a href="#" class="btn btn-danger removeFormButton">Hapus</a>
+          </td>
+        `;
+    // Tambahkan form baru ke dalam container
+    document.getElementById('formContainer').appendChild(newRow);
+    // Tambahkan event listener untuk tombol hapus form
+    newRow.querySelector('.removeFormButton').addEventListener('click', function() {
+      event.preventDefault(); // Mencegah aksi default dari tautan  
+      newRow.remove();
+    });
+    // Tambahkan event listener untuk setiap elemen select
+    newRow.querySelectorAll('select').forEach(function(select) {
+      select.addEventListener('change', function() {
+        console.log('Nilai yang dipilih:', this.value);
+      });
+    });
+    document.getElementById('updateFilterLocalStorage').addEventListener('click', function() {
+      updateFilterLocalStorage();
+    });
+  });
+</script>
+<!-- modal filter -->
+
+<script>
+  // Fungsi untuk memperbarui localStorage
+  function updateFilterLocalStorage() {
+    // logic-operator
+    var logicOperatorSelect = document.getElementById('logicOperator');
+    var selectedValue = logicOperatorSelect.value;
+    // data = {
+    //   data: 'coba'
+    // }
+    //
+    var forms = [];
+    var formRows = document.querySelectorAll('#formContainer tr');
+    // var filterType = row.querySelector('.logic-operator');
+    formRows.forEach(function(row) {
+      var searchSelect = row.querySelector('.search-select');
+      var operatorSelect = row.querySelector('.operator-select');
+      var value1Input = row.querySelector('input[name="value1"]');
+      var value2Input = row.querySelector('input[name="value2"]');
+      var form = {
+        search: searchSelect.value,
+        operator: operatorSelect.value,
+        value1: value1Input.value,
+        value2: value2Input.value
+      };
+      forms.push(form);
+    });
+    // localStorage.setItem('parameterArrayBaru', JSON.stringify(data));
+    var storedData = localStorage.getItem('parameterArray');
+    storedData = storedData ? JSON.parse(storedData) : {};
+    data_forms = {
+      'limit': storedData.limit,
+      'page': storedData.page,
+      'filters': forms,
+      'filter_type': selectedValue
+    }
+    Object.assign(storedData, data_forms);
+    // Menetapkan properti data di objek storedData ke forms
+    // storedData.data = data_forms;
+    // storedData.data = Object.assign({}, storedData.data, data_forms);
+    // storedData = {
+    //   "limit": 5,
+    //   "page": 1,
+    //   "filters": [
+    //     {
+    //       "search": "commission_code",
+    //       "operator": "is equal to",
+    //       "value1": "K1",
+    //       "value2": "K1"
+    //     }
+    //   ],
+    //   "filter_type": "AND" 
+    // };
+    // Simpan ke localStorage
+    localStorage.setItem('parameterArray', JSON.stringify(storedData));
+    // document.addEventListener('DOMContentLoaded', fetchDataFromLocalStorageAndRender);
+    //   document.addEventListener('DOMContentLoaded', function() {
+    //   var storedData = localStorage.getItem('parameterArray');
+    //   var tableBody = document.getElementById('tableBody');
+    //   if (storedData) {
+    //         var requestData = JSON.parse(storedData);
+    //         fetch('/dummy-commissions', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify(requestData)
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             data.forEach(item => {
+    //                 var row = document.createElement('tr');
+    //                 row.innerHTML = `
+    //                     <td>${item.commission_code}</td>
+    //                     <td>${item.commission_name}</td>
+    //                     <td>${item.commission_note}</td>
+    //                     <td>${item.is_active}</td>
+    //                 `;
+    //                 tableBody.appendChild(row);
+    //             });
+    //             // Menyimpan array input ke dalam localStorage
+    //             localStorage.setItem('dataArray', JSON.stringify(data));
+    //         })
+    //         .catch(error => console.error('Error fetching data:', error));
+    //     } else {
+    //         console.error('Data tidak ditemukan di localStorage');
+    //     }
+    // });
+    fetch('/dummy-commissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(storedData)
+      })
+      .then(response => response.json())
+      // .then(data => console.log(data))
+      .then(data => {
+        // Menampilkan data di dalam div dengan id "result"
+        var resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = ""; // Mengosongkan isi div sebelumnya
+        resultDiv.innerHTML = JSON.stringify(data); // Menampilkan data JSON
+        // // Menyimpan array input ke dalam localStorage
+        localStorage.setItem('dataArray', JSON.stringify(data));
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Menyimpan pesan kesalahan ke localStorage
+        localStorage.setItem('fetchError', error.toString());
+      });
+  }
+</script>
+<!-- simpan filter -->
+
+<script>
+  document.getElementById('addFormSortButton').addEventListener('click', function() {
+    // Buat elemen form baru
+    // var newForm = document.createElement('div');
+    // newForm.classList.add('form-item');
+    var newRow = document.createElement('tr');
+    // Tambahkan input field ke dalam form baru
+    newRow.innerHTML = `
+          <td>
+            <div class="form-group">
+              <select class="form-control field-select" name="search_sort">
+                <option value="none"> </option>
+                <option value="commission_code">Commission Code</option>
+                <option value="commission_name">Commission Name</option>
+                <option value="commission_note">Commission Note</option>
+                <option value="is_active">Is Active</option>
+                <option value="create_by">Created By</option>
+                <option value="create_date">Create Date</option>
+                <option value="update_by">Updated By</option>
+                <option value="update_date">Update Date</option>
+              </select>
+            </div>
+          </td>
+          <td>
+            <div class="form-group">
+              <select id="sort" class="form-control order-select" name="sort">
+                <option value="none"> </option>
+                <option value="ASC">Ascending</option>
+                <option value="DESC">Descending</option>
+              </select>
+            </div>
+          </td>
+          <td>
+            <a href="#" class="btn btn-danger removeSortFormButton">Hapus</a>
+          </td>
+        `;
+    // Tambahkan form baru ke dalam container
+    document.getElementById('formSortContainer').appendChild(newRow);
+    // Tambahkan event listener untuk tombol hapus form
+    newRow.querySelector('.removeSortFormButton').addEventListener('click', function() {
+      event.preventDefault(); // Mencegah aksi default dari tautan  
+      newRow.remove();
+    });
+    // Tambahkan event listener untuk setiap elemen select
+    newRow.querySelectorAll('select').forEach(function(select) {
+      select.addEventListener('change', function() {
+        console.log('Nilai yang dipilih:', this.value);
+      });
+    });
+    document.getElementById('updateLocalStorageButton').addEventListener('click', function() {
+      updateLocalStorage();
+    });
+  });
+</script>
+<!-- modal sort -->
+
+<script>
+  // Fungsi untuk menyimpan nilai form ke dalam localStorage
+  function updateLocalStorage() {
+    var forms = [];
+    var formRows = document.querySelectorAll('#formSortContainer tr');
+    formRows.forEach(function(row) {
+      var fieldSelect = row.querySelector('.field-select');
+      var orderSelect = row.querySelector('.order-select');
+      var form = {
+        field: fieldSelect.value,
+        order: orderSelect.value
+      };
+      forms.push(form);
+    });
+    // get localStorage
+    var storedData = localStorage.getItem('parameterArray');
+    storedData = storedData ? JSON.parse(storedData) : {};
+    // storedData = storedData ? JSON.parse(storedData) : [];
+    // array
+    data_forms = {
+      'sorts': forms
+    }
+    // Menggabungkan objek data_forms ke dalam storedData menggunakan Object.assign
+    Object.assign(storedData, data_forms);
+    // storedData.data = data_forms;
+    // storedData.data = Object.assign({}, storedData.data, data_forms);
+    // Simpan ke localStorage
+    localStorage.setItem('parameterArray', JSON.stringify(storedData));
+    fetch('/dummy-commissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(storedData)
+      })
+      .then(response => response.json())
+      // .then(data => console.log(data))
+      .then(data => {
+        // Menampilkan data di dalam div dengan id "result"
+        var resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = ""; // Mengosongkan isi div sebelumnya
+        resultDiv.innerHTML = JSON.stringify(data); // Menampilkan data JSON
+        // Menyimpan array input ke dalam localStorage
+        localStorage.setItem('dataArray', JSON.stringify(data));
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // Menyimpan pesan kesalahan ke localStorage
+        localStorage.setItem('fetchError', error.toString());
+      });
+  }
+</script>
+<!-- simpan sort -->
+
+<!-- <script src="{{ url_for('static', filename='app.js') }}"></script> -->
+
+<!-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/persons')
+                .then(response => response.json())
+                .then(data => {
+                    const personList = document.getElementById('data1').getElementsByTagName('tbody')[0];
+                    data.forEach(person => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${person.code}</td>
+                            <td>${person.name}</td>
+                            <td>${person.note}</td>
+                            <td>${person.active}</td>
+                            <td>
+                                <a href="/edit" class="btn btn-warning stretched-link">Edit</a>
+                                <a href="#" class="btn btn-danger stretched-link" onclick="confirmAlert()">Delete</a>
+                            </td>
+                        `;
+                        personList.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching person data:', error));
+        });
+    </script> -->
+
+<script type="text/javascript">
+  function sweetAlert() {
+    Swal.fire('Any fool can use a computer')
+  }
+
+  function successAlert() {
+    Swal.fire(
+      'Ini judul',
+      'Ini text dibawah judul',
+      'question'
+    )
+  }
+
+  function dangerAlert() {
+    Swal.fire({
+      type: 'error',
+      title: 'Oops...',
+      text: 'Ada yang gak beres ini',
+      footer: '<a href> Ini Footer! </a>'
+    })
+  }
+
+  function likeAlert() {
+    Swal.fire({
+      title: '<strong>HTML <u>example</u></strong>',
+      type: 'info',
+      html: 'You can use <b>bold text</b>, ' +
+        '<a href="//sweetalert2.github.io">links</a> ' +
+        'and other HTML tags',
+      showCloseButton: true,
+      showCancelButton: true,
+      focusConfirm: false,
+      confirmButtonText: '<i class="fa fa-thumbs-up"></i> Great!',
+      confirmButtonAriaLabel: 'Thumbs up, great!',
+      cancelButtonText: '<i class="fa fa-thumbs-down"></i>',
+      cancelButtonAriaLabel: 'Thumbs down'
+    })
+  }
+
+  function confirmAlert(commissionCode) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Apakah Anda Ingin Menghapus Data Ini",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Iya, Hapus!'
+    }).then((result) => {
+      if (result.value) {
+        Swal.fire(
+          'Deleted!',
+          'Data Ini Telah Tehapus.',
+          'success'
+        )
+        setTimeout(function() {
+          window.location.href = `/commissions/${commissionCode}/destroy`;
+        }, 2000);
+      }
+    })
+  }
+</script>
+{% endblock %}

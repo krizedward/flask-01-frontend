@@ -1,0 +1,149 @@
+<!-- about.html -->
+{% extends "base.html" %}
+{% block title %}Edit - Commission{% endblock %}
+
+{% block breadcrumb %}
+<section class="content-header">
+    <h1>
+      Commission
+      <small>update pages</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Update</li>
+    </ol>
+  </section>
+{% endblock %}
+
+{% block content %}
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+          <!-- column -->
+          <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-warning">
+
+              <!-- form start -->
+              {% for data in commissions %}
+              <form action="/commissions/{{ data.commission_code }}/edit" role="form" method="POST">
+                
+                <div class="box-body">
+                  <div class="form-group">
+                    <label>current_code</label>
+                    <input name="commission_code" type="text" class="form-control" value="{{ data.commission_code }}" disabled>
+                  </div>
+
+                  <div class="form-group">
+                    <label>period_code</label>
+                    <input name="commission_name" type="text" class="form-control" value="{{ data.commission_name }}">
+                  </div>
+
+                  <div class="form-group">
+                    <label>current_period_note</label>
+                    <input name="commission_note" type="text" class="form-control" value="{{ data.commission_note }}">
+                  </div>
+                  
+                  <!-- <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                  </div> -->
+
+                  <!-- <div class="form-group">
+                    <label for="exampleInputFile">File input</label>
+                    <input type="file" id="exampleInputFile">
+  
+                    <p class="help-block">Example block-level help text here.</p>
+                  </div> -->
+
+                  <!-- <div class="checkbox">
+                    <label>
+                      <input type="checkbox"> Check me out
+                    </label>
+                  </div> -->
+                  
+                </div>
+                
+                <!-- /.box-body -->
+  
+                <div class="box-footer">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <!-- <button type="reset" class="btn btn-warning">Reset</button> -->
+                </div>
+              </form>
+              {% endfor %}
+            </div>
+            <!-- /.box -->
+          </div>
+          <!--/.col -->
+        </div>
+        <!-- /.row -->
+      </section>
+      <!-- /.content -->
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+  function sweetAlert() 
+    {  
+     Swal.fire('Any fool can use a computer') 
+    }
+  function successAlert()
+  {
+      Swal.fire(
+          'Ini judul',
+          'Ini text dibawah judul',
+          'question'
+      )
+  }
+  function dangerAlert()
+  {
+      Swal.fire({
+          type: 'error',
+          title: 'Oops...',
+          text: 'Ada yang gak beres ini',
+          footer: '<a href> Ini Footer! </a>'
+      })
+  }
+  function likeAlert()
+  {
+      Swal.fire({
+          title: '<strong>HTML <u>example</u></strong>',
+          type: 'info',
+          html:
+          'You can use <b>bold text</b>, ' +
+          '<a href="//sweetalert2.github.io">links</a> ' +
+          'and other HTML tags',
+          showCloseButton: true,
+          showCancelButton: true,
+          focusConfirm: false,
+          confirmButtonText:
+          '<i class="fa fa-thumbs-up"></i> Great!',
+          confirmButtonAriaLabel: 'Thumbs up, great!',
+          cancelButtonText:
+          '<i class="fa fa-thumbs-down"></i>',
+          cancelButtonAriaLabel: 'Thumbs down'
+         })
+  }
+  function confirmAlert()
+  {
+      Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          type: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+         }).then((result) => {
+          if (result.value) {
+           Swal.fire(
+            'Deleted!',
+            'Your file has been deleted.',
+            'success'
+            )
+          }
+      })
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,78 @@
+<!-- about.html -->
+{% extends "base.html" %}
+{% block title %}Create - Commission{% endblock %}
+
+{% block breadcrumb %}
+<section class="content-header">
+    <h1>
+      Commission
+      <small>create pages</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Create</li>
+    </ol>
+  </section>
+{% endblock %}
+
+{% block content %}
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+          <!-- column -->
+          <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-success">
+
+              <!-- form start -->
+              <form action="/commissions/create" role="form" method="POST">
+                <div class="box-body">
+                  <div class="form-group">
+                    <label>commission code</label>
+                    <input name="commission_code" type="text" class="form-control" placeholder="commission code">
+                  </div>
+
+                  <div class="form-group">
+                    <label>commission name</label>
+                    <input name="commission_name" type="text" class="form-control" placeholder="commission name">
+                  </div>
+
+                  <div class="form-group">
+                    <label>commission note</label>
+                    <input name="commission_note" type="text" class="form-control" placeholder="commission note">
+                  </div>
+
+                  <!-- <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                  </div> -->
+
+                  <!-- <div class="form-group">
+                    <label for="exampleInputFile">File input</label>
+                    <input type="file" id="exampleInputFile">
+  
+                    <p class="help-block">Example block-level help text here.</p>
+                  </div> -->
+
+                  <!-- <div class="checkbox">
+                    <label>
+                      <input type="checkbox"> Check me out
+                    </label>
+                  </div> -->
+                  
+                </div>
+                <!-- /.box-body -->
+  
+                <div class="box-footer">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+              </form>
+            </div>
+            <!-- /.box -->
+          </div>
+          <!--/.col -->
+        </div>
+        <!-- /.row -->
+      </section>
+      <!-- /.content -->
+{% endblock %}
