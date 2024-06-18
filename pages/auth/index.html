@@ -1,0 +1,17 @@
+{% extends "template.html" %}
+
+{% block title %} Auth - Index {% endblock %}
+
+{% block content %}
+<h1>auth index</h1>
+{{ message }}
+
+<br>
+<a href="{{ url_for('set_data') }}">Set Session Data</a><br>
+<a href="{{ url_for('get_data') }}">Get Session Data</a><br>
+<a href="{{ url_for('clear_session') }}">Clear Session Data</a><br>
+<a href="{{ url_for('set_cookie') }}">Set Cookie</a><br>
+<a href="{{ url_for('get_cookie') }}">get Cookie</a><br>
+<a href="{{ url_for('remove_cookie') }}">remove Cookie</a><br>
+<a href="{{ url_for('form_login') }}">Form Login</a><br>
+{% endblock %}

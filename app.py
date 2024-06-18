@@ -1,4 +1,5 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash, make_response
+from flask_session import Session
 import requests
 import logging
 import hashlib
@@ -7,15 +8,80 @@ app = Flask(__name__, template_folder='pages')
 base_url = "http://192.168.100.105:8000"
 app.secret_key = 'supersecretkey' 
 
-# Simulated database
-commissions = [
-    {'id': 1,'code': 'Surabaya', 'name': 'Edward', 'note': 'note', 'active': 'active',},
-    {'id': 2,'code': 'Surabaya', 'name': 'Kristian', 'note': 'note', 'active': 'active',},
-    {'id': 3,'code': 'Surabaya', 'name': 'Kristian', 'note': 'note', 'active': 'active',}
-]
-
 bearer_token = " "
 bearer_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2NvZGUiOiJhZG1pbmlzdHJhdG9yIiwiZXhwIjoxNzE3NTU1NjA4fQ.43CaRX0A523evQmkDc2oo4vR2IdxwxPFk-H0R1-JRds"
+
+##### session
+SESSION_TYPE = "filesystem"
+app.config.from_object(__name__)
+Session(app)
+
+@app.route("/set/<string:value>")
+def set_session(value):
+    session["key"] = value
+    return "<h1>Ok</h1>"
+
+@app.route("/get")
+def get_session():
+    stored_session = session.get("key", "No Session was set")
+    return f"<h3>{stored_session}</h3>"
+
+@app.route("/set_data")
+def set_data():
+    # session['name'] = 'Mike'
+    # session['other'] = 'Hello World'
+    session['name'] = 'Edward'
+    session['other'] = 'Mangare'
+    return render_template('auth/index.html', message = 'session get data')
+
+@app.route("/get_data")
+def get_data():
+    if 'name' in session.keys() and 'other' in session.keys():
+        name = session['name']
+        other = session['other']
+        return render_template('auth/index.html', message = f'Name: {name}, Other: {other}')
+    else:
+        return render_template('auth/index.html', message = 'No session found.')
+
+@app.route('/clear_session')
+def clear_session():
+    session.clear()
+    # session.pop('name')
+    return render_template('auth/index.html', message = 'Session Clear')
+
+##### cookie
+@app.route('/set_cookie')
+def set_cookie():
+    response = make_response(render_template('auth/index.html', message = 'Cookie Set.'))
+    response.set_cookie('cookie_name','cookie_value')
+    return response
+
+@app.route('/get_cookie')
+def get_cookie():
+    cookie_value = request.cookies['cookie_name']
+    return render_template('auth/index.html', message = f'Cookie Value: {cookie_value}')
+
+@app.route('/remove_cookie')
+def remove_cookie():
+    response = make_response(render_template('auth/index.html', message = 'Cookie Remove.'))
+    response.set_cookie('cookie_name', expires=0)
+    return response
+
+@app.route('/form-login', methods=['GET','POST'])
+def form_login():
+    if request.method == 'GET':
+        return render_template('auth/form-login.html')
+    elif request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        if username == 'edward' and password == '123':
+            flash('Login')
+            return render_template('auth/index.html', message = '')
+        else:
+            flash('Gagal Login')
+            return render_template('auth/index.html', message = '')
+    
+    # return render_template('auth/form-login.html')
 
 ##### koding baru
 
@@ -85,10 +151,6 @@ def api_data():
     return jsonify(response.json()), 200
     # return response.json()
     # return jsonify(commissions)
-
-@app.route('/api/commissions', methods=['GET'])
-def get_commissions():
-    return jsonify(commissions)
 
 # route
 @app.route('/')
@@ -173,7 +235,7 @@ def commissions():
         # response = requests.post(f"{base_url}/login", data=login_data)
         commissions = response.json()
         return render_template('commissions-index.html', commissions=commissions)
-
+##### filter modal
 
 ##### comission pagging
 @app.route('/commission_paging')
@@ -201,58 +263,18 @@ def commissionPaging():
             ]
         }
 
-        # filter = {
-        #     "filters": [
-        #         {
-        #             "search": "commission_code",     # Change this as needed
-        #             "operator": "is equal to",  # Change this as needed
-        #             "value1": "K1",     # Change this as needed
-        #             "value2": "K1"      # Change this as needed
-        #         }
-        #     ],
-        #     "filter_type": "AND"            # Change this as needed
-        # }
-    
-
-    # filter = {
-    #     "filters": [
-    #         {
-    #             "search": "string",     # Change this as needed
-    #             "operator": "is equal to",  # Change this as needed
-    #             "value1": "string",     # Change this as needed
-    #             "value2": "string"      # Change this as needed
-    #         }
-    #     ],
-    #     "filter_type": "AND"            # Change this as needed
-    # }
-
-    # sort = {
-    #     "sorts": [
-    #         {
-    #             "field": "string",  # Change this as needed
-    #             "order": "ASC"      # Change this as needed
-    #         }
-    #     ]
-    # }
-
-    # Combine all the data into one dictionary
+        # Combine all the data into one dictionary
         datas = {**page, **sort}
         # datas = page
 
         response = requests.post(f"{base_url}/commission_paging", headers=headers, json=datas)
-        # response = requests.post(f"{base_url}/login", data=login_data)
-    # commissions = response.json()
-    # return render_template('commissions-index.html', commissions=commissions)
     
     # Return the JSON response from the API
     if response.status_code == 200:
         return jsonify(response.json()), 200
     else:
         return jsonify({"error": "Failed to retrieve commissions"}), response.status_code
-
-# @app.route('/create')
-# def about():
-#     return render_template('commisions-create.html')
+##### paging
 
 @app.route('/commissions/create', methods=['GET','POST'])
 def commissions_store():
@@ -297,10 +319,7 @@ def commissions_store():
         return render_template('commisions-create.html')
     # return redirect('/commissions')
     # return render_template('commissions-index.html')
-
-# @app.route('/edit')
-# def edit():
-#     return render_template('edit.html')
+##### create and store
 
 @app.route('/commissions/<commission_id>/edit', methods=['GET', 'POST'])
 def commissions_edit(commission_id):
@@ -342,6 +361,7 @@ def commissions_edit(commission_id):
                 return redirect(f"/commissions/{commission_id}/edit")
         except Exception as e:
             return f"Error occurred: {str(e)}"
+##### edit and update
 
 @app.route('/commissions/<commission_id>/destroy', methods=['GET'])
 def commissions_destroy(commission_id):
@@ -360,28 +380,9 @@ def commissions_destroy(commission_id):
 @app.route('/login')
 def login():
     return render_template('login.html')
+##### login
 
-# dummies api
-@app.route('/person')
-def person():
-    data = [
-        {
-            'name': 'Edward',
-            'address': 'Surabaya'
-        },
-        {
-            'name': 'Alice',
-            'address': 'Jakarta'
-        },
-        {
-            'name': 'Bob',
-            'address': 'Bandung'
-        }
-    ]
-    return jsonify(data)
-    # return render_template('index.html', person=data)
-
-@app.route('/dummy-commissions', methods=['GET', 'POST'])
+@app.route('/fetch-commissions', methods=['GET', 'POST'])
 def dummyCommissions():
     bearer_token = session.get('bearer_token')
     headers = {"Authorization": f"Bearer {bearer_token}"}
@@ -390,65 +391,20 @@ def dummyCommissions():
         
         response = requests.get(base_url+"/commissions", headers=headers)
         commissions = response.json()
-        # return render_template('commissions-index.html', token=token, commissions=commissions)
-    
-
-        # page = {
-        #     'limit': 10,  # Change this as needed
-        #     'page': 1     # Change this as needed
-        # }
-
-        # berhasil
-        # datas = request.json
-        
-        # response = requests.get(base_url+"/commissions", headers=headers)
-        # response = requests.get(f"{base_url}/commissions", headers=headers, json=datas)        
-        # commissions = response.json()
         
         return jsonify(commissions)
     
     if request.method == 'POST':
         commissions = []
 
-        # page = {
-        #     'limit': 10,  # Change this as needed
-        #     'page': 1     # Change this as needed
-        # }
-
         # berhasil
         datas = request.json
         
-        # response = requests.get(base_url+"/commissions", headers=headers)
         response = requests.post(f"{base_url}/commission_paging", headers=headers, json=datas)        
         commissions = response.json()
         
         return jsonify(commissions)
-    
-
-@app.route('/api/fetch-data', methods=['GET'])
-def fetch_data():
-    # URL dari API yang akan diakses
-    api_url = 'https://api.example.com/data'
-    
-    # Auth token yang akan digunakan
-    auth_token = 'your_auth_token_here'
-    
-    # Headers dengan auth token
-    headers = {
-        'Authorization': f'Bearer {auth_token}'
-    }
-    
-    # Request ke API
-    response = requests.get(api_url, headers=headers)
-    
-    # Jika response status code 200 (OK)
-    if response.status_code == 200:
-        # Return data dalam bentuk JSON
-        return jsonify(response.json())
-    else:
-        # Return error message
-        return jsonify({'error': 'Failed to fetch data'}), response.status_code
-
+##### berhasil
 
 if __name__ == '__main__':
     app.run(debug=True)

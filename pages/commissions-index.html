@@ -71,7 +71,8 @@
         </div>
         <!-- box-body -->
         <div class="box-footer clearfix">
-          <span id="totalDataTable">Total Data 100</span>
+          <span id="totalDataTable"></span>
+          <!-- <span id="totalDataTable">Showing 1 to 10 of 57 entries Total Data 100</span> -->
           <ul class="pagination pagination-sm no-margin pull-right">
             <li><a href="#" id="previousPage">Previous</a></li>
             <!-- <li><a href="#" class="pageNumber">1</a></li>
@@ -138,7 +139,7 @@
         </div>
         <div class="modal-footer">
           <!-- <button type="submit" class="btn btn-success">Submit Fliter</button> -->
-          <button class="btn btn-success" id="updateFilterLocalStorage">Simpan ke Filter Storage</button>
+          <button class="btn btn-success" id="updateFilterLocalStorage">Submit Fliter</button>
         </div>
 
       </form>
@@ -183,7 +184,7 @@
         </div>
         <div class="modal-footer">
           <!-- <button type="submit" class="btn btn-success">Submit Sort</button> -->
-          <button class="btn btn-success" id="updateLocalStorageButton">Simpan ke localStorage</button>
+          <button class="btn btn-success" id="updateLocalStorageButton">Submit Sort</button>
         </div>
       </form>
     </div>
@@ -197,7 +198,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script>    
+<script>
   // proses lama
   var storedData = localStorage.getItem('parameterArray');
   // Periksa apakah ada data yang tersimpan di localStorage
@@ -208,10 +209,8 @@
       'limit': 5,
       'page': 1
     }
-
     localStorage.setItem('parameterArray', JSON.stringify(requestData));
-
-    fetch('/dummy-commissions', {
+    fetch('/fetch-commissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -227,7 +226,7 @@
   } else {
     // variable
     var parameterData = JSON.parse(localStorage.getItem('parameterArray'));
-    fetch('/dummy-commissions', {
+    fetch('/fetch-commissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -237,12 +236,19 @@
       .then(response => response.json())
       // .then(data => console.log(data))
       .then(data => {
+        // Data yang akan ditampilkan
+        // const datas = "Showing ${currentData} to ${totalPage} of ${totalData} entries Hello, this is the data to display!";
+        const totalData = data.length;
+        const datas = `Showing 1 to 5 of ${totalData} entries`;
+        // Ambil elemen dengan ID 'dataDisplay'
+        const dataDisplayElement = document.getElementById('totalDataTable');
+        // Tampilkan data di elemen tersebut
+        dataDisplayElement.textContent = datas;
         tableDataFetch(data);
       })
       .catch(error => console.error('Error:', error));
     // console.error('Data tidak ditemukan di localStorage');
   }
-
   document.getElementById('reset').addEventListener('click', function(event) {
     event.preventDefault();
     resetFunction();
@@ -275,26 +281,44 @@
     event.preventDefault();
     var storedData = localStorage.getItem('parameterArray');
     storedData = storedData ? JSON.parse(storedData) : {};
-
     var jumlahData = JSON.parse(localStorage.getItem('jumlahData'));
-
-    if(jumlahData < storedData.limit) {
-      currentValue = storedData.page;  
+    if (jumlahData < storedData.limit) {
+      currentValue = storedData.page;
     } else {
       var currentValue = storedData.page;
       currentValue += 1;
     }
-
     var data_forms = {
       'page': currentValue
     }
-    
     Object.assign(storedData, data_forms);
     localStorage.setItem('parameterArray', JSON.stringify(storedData));
-
     //panggil function
     fetchDataApi();
   });
+  // async function fetchDataAndDisplay() {
+  //   try {
+  //     // Mengambil data dari API (ganti URL dengan endpoint API sebenarnya)
+  //     const response = await fetch('/fetch-commissions');
+  //     const data = await response.json();
+  //     // Menampilkan total data (sesuaikan dengan struktur data API)
+  //     const totalData = data.length; // atau sesuaikan dengan format data API
+  //     // Dapatkan elemen HTML berdasarkan ID
+  //     const dataContainer = document.getElementById('totalDataTable');
+  //     var parameterData = JSON.parse(localStorage.getItem('parameterArray'));
+  //     console.log(parameterData.limit);
+  //     // Tampilkan data di dalam elemen HTML
+  //     const currentData = parameterData.limit;
+  //     const totalPage = Math.ceil(totalData / currentData); // Total halaman
+  //     dataContainer.textContent = `Showing ${currentData} to ${totalPage} of ${totalData} entries`;
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //     const dataContainer = document.getElementById('totalDataTable');
+  //     dataContainer.textContent = 'Error fetching data.';
+  //   }
+  // };
+  // // Panggil fungsi fetchDataAndDisplay untuk menjalankan saat halaman dimuat
+  // document.addEventListener('DOMContentLoaded', fetchDataAndDisplay);
 </script>
 
 <script>
@@ -342,7 +366,7 @@
   function fetchDataApi() {
     // variable
     var parameterData = JSON.parse(localStorage.getItem('parameterArray'));
-    fetch('/dummy-commissions', {
+    fetch('/fetch-commissions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -404,6 +428,30 @@
     localStorage.setItem('parameterArray', JSON.stringify(storedData));
     // panggil function
     fetchDataApi();
+    // TypeError: response.json is not a function
+    // var response = fetch('/fetch-commissions');
+    // var data = response.json();
+    // console.log(data);
+    fetch('/fetch-commissions')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Tampilkan data di konsol
+        // console.log(data);
+        const datas = `Showing 1 to ${length} of ${data.length} entries`;
+        // Ambil elemen dengan ID 'dataDisplay'
+        const dataDisplayElement = document.getElementById('totalDataTable');
+        // Tampilkan data di elemen tersebut
+        dataDisplayElement.textContent = datas;
+      })
+      .catch(error => {
+        // Tangani kesalahan
+        console.error('Error fetching data:', error);
+      });
   }
 </script>
 <!-- changeTableLength -->
