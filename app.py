@@ -1,15 +1,98 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash, make_response
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash, make_response, Response, send_file
 from flask_session import Session
 import requests
 import logging
 import hashlib
+import os
+from dotenv import load_dotenv, dotenv_values
+
+from reportlab.pdfgen import canvas
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib import colors
+
+load_dotenv()
 
 app = Flask(__name__, template_folder='pages')
-base_url = "http://192.168.100.105:8000"
-app.secret_key = 'supersecretkey' 
+base_url = os.environ.get('BASEURL')
+# base_url = 'http://192.168.100.105:8000'
+app.secret_key = os.environ.get('SECRET_KEY')
+# app.secret_key = 'supersecretkey'
 
 bearer_token = " "
 bearer_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2NvZGUiOiJhZG1pbmlzdHJhdG9yIiwiZXhwIjoxNzE3NTU1NjA4fQ.43CaRX0A523evQmkDc2oo4vR2IdxwxPFk-H0R1-JRds"
+
+@app.route('/generate-pdf')
+def generate_pdf():
+    # Create a file-like buffer to receive PDF data
+    buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file"
+    p = canvas.Canvas(buffer)
+
+     # Create a SimpleDocTemplate using the buffer as its "file"
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+    # Create content for the PDF
+    content = []
+
+    # Create a table data
+    data = [
+        ['Header 1', 'Header 2', 'Header 3'],
+        ['Row 1, Col 1', 'Row 1, Col 2', 'Row 1, Col 3'],
+        ['Row 2, Col 1', 'Row 2, Col 2', 'Row 2, Col 3'],
+    ]
+
+    # Create a Table object
+    table = Table(data)
+
+    # Add style to the table
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+    ])
+    table.setStyle(style)
+
+    # Add table to content
+    content.append(table)
+
+    # Build the PDF
+    doc.build(content)
+
+    # Get the value of the BytesIO buffer and write it to the response
+    pdf_value = buffer.getvalue()
+    buffer.close()
+
+    response = make_response(pdf_value)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
+
+    return response
+
+    # # Draw things on the PDF. Here's some basic examples:
+    # p.drawString(100, 750, "Hello, World!")
+    # p.drawString(100, 730, "This is a PDF document generated with ReportLab.")
+
+    # # Close the PDF object cleanly
+    # p.showPage()
+    # p.save()
+
+    # # Get the value of the BytesIO buffer and write it to the response
+    # pdf_value = buffer.getvalue()
+    # buffer.close()
+
+    # response = make_response(pdf_value)
+    # response.headers['Content-Type'] = 'application/pdf'
+    # response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
+
+    # return response
 
 ##### session
 SESSION_TYPE = "filesystem"
@@ -37,7 +120,11 @@ def set_data():
 @app.route("/get_data")
 def get_data():
     if 'name' in session.keys() and 'other' in session.keys():
-        name = session['name']
+        print(session)
+        # name = session['name']
+        name = session.pop('name')
+        print(name)
+        print(session)
         other = session['other']
         return render_template('auth/index.html', message = f'Name: {name}, Other: {other}')
     else:
