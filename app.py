@@ -8,10 +8,13 @@ from dotenv import load_dotenv, dotenv_values
 
 from reportlab.pdfgen import canvas
 import io
+from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from reportlab.lib import colors
+
+from PyPDF2 import PdfReader, PdfWriter
 
 load_dotenv()
 
@@ -20,6 +23,8 @@ base_url = os.environ.get('BASEURL')
 # base_url = 'http://192.168.100.105:8000'
 app.secret_key = os.environ.get('SECRET_KEY')
 # app.secret_key = 'supersecretkey'
+# location upload
+app.config['UPLOAD_FOLDER'] = './static/uploads'
 
 bearer_token = " "
 bearer_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2NvZGUiOiJhZG1pbmlzdHJhdG9yIiwiZXhwIjoxNzE3NTU1NjA4fQ.43CaRX0A523evQmkDc2oo4vR2IdxwxPFk-H0R1-JRds"
@@ -38,43 +43,77 @@ def generate_pdf():
     # Create content for the PDF
     content = []
 
+    bearer_token = session.get('bearer_token')
+    headers = {"Authorization": f"Bearer {bearer_token}"}
+
+    # Fetch data from API
+    response = requests.get(base_url + "/commissions", headers=headers)
+    if response.status_code == 200:
+        commissions = response.json()
+        # Prepare data for the table
+        data = [['Commission Code', 'Commission Name', 'Commission Note', 'Is Active']]
+
+        for commission in commissions:
+            commission_code = commission.get('commission_code')
+            commission_name = commission.get('commission_name')
+            commission_note = commission.get('commission_note')
+            is_active = 'Yes' if commission.get('is_active') else 'No'
+            
+            data.append([commission_code, commission_name, commission_note, is_active])
+
+        # Create a Table object
+        table = Table(data)
+
+        # Add style to the table
+        style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ])
+        table.setStyle(style)
+
+        # Add table to content
+        content.append(table)
+
+        # Build the PDF
+        doc.build(content)
+
+        # Get the value of the BytesIO buffer and write it to the response
+        pdf_value = buffer.getvalue()
+        buffer.close()
+
+        # output pdf
+        response = make_response(pdf_value)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
+
+        return response
+    
+    else:
+        # Handle API request failure
+        return "Failed to fetch data from API", response.status_code
+    
+    # commissions = []
+        
+    # response = requests.get(base_url+"/commissions", headers=headers)
+    # commissions = response.json()
+    # token = bearer_token
+
     # Create a table data
-    data = [
-        ['Header 1', 'Header 2', 'Header 3'],
-        ['Row 1, Col 1', 'Row 1, Col 2', 'Row 1, Col 3'],
-        ['Row 2, Col 1', 'Row 2, Col 2', 'Row 2, Col 3'],
-    ]
+    # data = [
+    #     ['Commission Code', 'Commission Name', 'Commission Note', 'Is Active'],
+    #     ['Row 1, Col 1', 'Row 1, Col 2', 'Row 1, Col 3', 'Row 1, Col 3'],
+    #     ['Row 2, Col 1', 'Row 2, Col 2', 'Row 2, Col 3', 'Row 1, Col 3'],
+    # ]
 
     # Create a Table object
-    table = Table(data)
+    # table = Table(data)
 
-    # Add style to the table
-    style = TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-    ])
-    table.setStyle(style)
-
-    # Add table to content
-    content.append(table)
-
-    # Build the PDF
-    doc.build(content)
-
-    # Get the value of the BytesIO buffer and write it to the response
-    pdf_value = buffer.getvalue()
-    buffer.close()
-
-    response = make_response(pdf_value)
-    response.headers['Content-Type'] = 'application/pdf'
-    response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
-
-    return response
+    
 
     # # Draw things on the PDF. Here's some basic examples:
     # p.drawString(100, 750, "Hello, World!")
@@ -492,6 +531,62 @@ def dummyCommissions():
         
         return jsonify(commissions)
 ##### berhasil
+
+@app.route('/pdf-raport')
+def pdf_raport():
+    return render_template('pdf-raport.html')
+
+@app.route('/upload-raport', methods=['POST'])
+def upload_raport():
+    if request.method == 'POST':
+        # Check if the post request has the file part
+        if 'file' not in request.files:
+            return 'Tidak ada file yang dipilih untuk diunggah.', 400
+
+        file = request.files['file']
+
+        # If user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            return 'Tidak ada file yang dipilih untuk diunggah.', 400
+
+        if file:
+            filename = file.filename
+
+            # Read the existing PDF
+            existing_pdf = PdfReader(file)
+            output = PdfWriter()
+
+            # Create a new PDF with ReportLab
+            packet = BytesIO()
+            can = canvas.Canvas(packet)
+            # x dan y
+            # can.drawString(100, 750, "Hello, World!")
+            # can.drawString(100, 730, "This is a PDF document generated with ReportLab.")
+            can.setFont("Helvetica", 6)  # Mengatur ukuran font menjadi 10
+            can.drawString(170, 725, "Edward")
+            can.save()
+
+            # Move to the beginning of the BytesIO buffer
+            packet.seek(0)
+            new_pdf = PdfReader(packet)
+
+            # Add the "watermark" (which is the new pdf) on the existing page
+            for page_num in range(len(existing_pdf.pages)):
+                page = existing_pdf.pages[page_num]
+                if page_num == 0:  # Add new content only to the first page
+                    page.merge_page(new_pdf.pages[0])
+                output.add_page(page)
+
+            # Save the result
+            temp_file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            with open(temp_file_path, 'wb') as f:
+                output.write(f)
+
+            # Send the file back to the user for download
+            return send_file(temp_file_path, as_attachment=True, download_name=filename)
+
+    return 'Gagal mengunggah file.', 400
 
 if __name__ == '__main__':
     app.run(debug=True)
