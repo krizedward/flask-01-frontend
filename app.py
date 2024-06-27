@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash, make_response, Response, send_file
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash, make_response, Response, send_file, send_from_directory
 from flask_session import Session
 import requests
 import logging
@@ -19,6 +19,8 @@ from PyPDF2 import PdfReader, PdfWriter
 load_dotenv()
 
 app = Flask(__name__, template_folder='pages')
+app.config['UPLOAD_FOLDER'] = 'uploads/'
+app.config['ALLOWED_EXTENSIONS'] = {'pdf'}
 base_url = os.environ.get('BASEURL')
 # base_url = 'http://192.168.100.105:8000'
 app.secret_key = os.environ.get('SECRET_KEY')
@@ -565,6 +567,7 @@ def upload_raport():
             # can.drawString(100, 730, "This is a PDF document generated with ReportLab.")
             can.setFont("Helvetica", 6)  # Mengatur ukuran font menjadi 10
             can.drawString(170, 725, "Edward")
+            can.drawString(170, 710, "1234567890")
             can.save()
 
             # Move to the beginning of the BytesIO buffer
@@ -587,6 +590,29 @@ def upload_raport():
             return send_file(temp_file_path, as_attachment=True, download_name=filename)
 
     return 'Gagal mengunggah file.', 400
+
+# Untuk Melihat Pdf
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return redirect(request.url)
+    file = request.files['file']
+    if file.filename == '':
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = file.filename
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        # return redirect(url_for('uploaded_file', filename=filename))
+        return render_template('pdf-raport.html', filename=filename)
+    return redirect(request.url)
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True)

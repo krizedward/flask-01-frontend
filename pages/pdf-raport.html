@@ -74,6 +74,17 @@
         <!--/.col -->
     </div>
     <!-- /.row -->
+
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+
+    {% if filename %}
+        <h2>Uploaded PDF:</h2>
+        <!-- <embed src="{{ url_for('uploaded_file', filename=filename) }}" width="800px" height="600px"/> -->
+        <iframe src="{{ url_for('uploaded_file', filename=filename) }}" width="800px" height="600px" frameborder="0"></iframe>
+    {% endif %}
 </section>
 <!-- /.content -->
 {% endblock %}
