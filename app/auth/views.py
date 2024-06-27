@@ -37,7 +37,7 @@ def postlogin():
             # Ambil token dari respon dan simpan ke dalam session
             bearer_token = response.json().get('access_token')
             session['bearer_token'] = bearer_token
-            return redirect('/main')
+            return redirect('/dashboard')
         else:
             return redirect('/login')
     else:

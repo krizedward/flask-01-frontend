@@ -1,22 +1,12 @@
-import os
-from flask import render_template, jsonify, session
-import requests
+from flask import render_template
 from . import main
 from ..auth.services import login_required 
 
-@main.route('/api/commissions', methods=['GET'])
+@main.route('/dashboard')
 @login_required
-def api_data():
-    bearer_token = session.get('bearer_token')
-    headers = {"Authorization": f"Bearer {bearer_token}"}
-    base_url = os.environ.get('BASEURL')
+def dashboard():
+    return render_template('main/dashboard.html')
 
-    if base_url:
-        response = requests.get(f"{base_url}/commissions", headers=headers)
-        return jsonify(response.json()), 200
-    else:
-        return jsonify({"error": "BASEURL not set in environment variables"}), 500
-    
 @main.route('/main')
 # @main.route('/')
 @login_required

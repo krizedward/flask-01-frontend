@@ -18,4 +18,7 @@ def create_app():
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    from .f01_commisions import f01_commisions as commisions_blueprint
+    app.register_blueprint(commisions_blueprint)
+
     return app
