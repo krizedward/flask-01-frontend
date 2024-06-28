@@ -1,0 +1,108 @@
+<!-- pdf-raport.html -->
+{% extends "skeleton/adminlte.html" %}
+
+{% block title %}Pdf - Raport{% endblock %}
+
+{% block breadcrumb %}
+<section class="content-header">
+    <h1>
+        Pdf Raport
+        <small>form pages</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Pdf Raport</li>
+    </ol>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <!-- column -->
+        <div class="col-md-4">
+            <!-- general form elements -->
+            <div class="box box-success">
+
+                <!-- form start -->
+                <form action="/upload-raport" role="form" method="POST" enctype="multipart/form-data">
+                    <div class="box-body">
+
+                        <div class="form-group">
+                            <label for="exampleInputFile">Upload Raport File</label>
+                            <input type="file" id="exampleInputFile" name="file">
+
+                            <p class="help-block">Example block-level help text here.</p>
+                        </div>
+
+                        <!-- <div class="form-group">
+                            <label>commission code</label>
+                            <input name="commission_code" type="text" class="form-control" placeholder="commission code">
+                        </div> -->
+
+                        <!-- <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                  </div> -->
+
+                        <!-- <div class="form-group">
+                    <label for="exampleInputFile">File input</label>
+                    <input type="file" id="exampleInputFile">
+  
+                    <p class="help-block">Example block-level help text here.</p>
+                  </div> -->
+
+                        <!-- <div class="checkbox">
+                    <label>
+                      <input type="checkbox"> Check me out
+                    </label>
+                  </div> -->
+
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary">Generate PDF</button>
+                        <button type="button" class="btn btn-success">Download</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.box -->
+        </div>
+        <!--/.col -->
+        <!-- column -->
+        <div class="col-md-8">
+            {% if filename %}
+            <div class="box box-success mt-4">
+                <div class="box-body">
+                    <h2>Uploaded PDF:</h2>
+                    <!-- <embed src="{{ url_for('uploaded_file', filename=filename) }}" width="800px" height="600px"/> -->
+                    <iframe src="{{ url_for('uploaded_file', filename=filename) }}" width="800px" height="600px"
+                        frameborder="0"></iframe>
+                </div>
+            </div>
+            {% else %}
+            <!-- general form elements -->
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <div class="box box-success">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="exampleInputFile">Upload Raport File</label>
+                            <input type="file" name="file">
+                            <p class="help-block">Example block-level help text here.</p>
+                        </div>
+                        <!-- <input type="submit" value="Upload"> -->
+                    </div>
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary">Generate PDF</button>
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+{% endblock %}
