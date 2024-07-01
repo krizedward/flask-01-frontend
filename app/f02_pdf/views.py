@@ -84,11 +84,11 @@ def upload_file():
         return redirect(request.url)
     if file and allowed_file(file.filename):
         filename = file.filename
-        file.save(os.path.join('uploads', filename))
-        # return redirect(url_for('uploaded_file', filename=filename))
-        return render_template('pdf-raport.html', filename=filename)
+        file.save(os.path.join(os.path.join(app.root_path, 'static', 'uploads'), filename))
+        # return render_template('f02_pdf/index.html')
+        return render_template('f02_pdf/index.html', filename=filename)
     return redirect(request.url)
 
 @f02_pdf.route('/uploads/<filename>')
 def uploaded_file(filename):
-    return send_from_directory('uploads', filename)
+    return send_from_directory(os.path.join(app.root_path, 'static', 'uploads'), filename)

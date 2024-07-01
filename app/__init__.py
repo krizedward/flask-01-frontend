@@ -10,6 +10,7 @@ def create_app():
 
     # Load
     app.secret_key = os.environ.get('SECRET_KEY')
+    app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)

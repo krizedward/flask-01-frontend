@@ -30,41 +30,18 @@
                     <div class="box-body">
 
                         <div class="form-group">
-                            <label for="exampleInputFile">Upload Raport File</label>
-                            <input type="file" id="exampleInputFile" name="file">
+                            <label for="pdf-upload">Upload Raport File</label>
+                            <input type="file" name="file" id="pdf-upload" accept="application/pdf">
 
                             <p class="help-block">Example block-level help text here.</p>
                         </div>
-
-                        <!-- <div class="form-group">
-                            <label>commission code</label>
-                            <input name="commission_code" type="text" class="form-control" placeholder="commission code">
-                        </div> -->
-
-                        <!-- <div class="form-group">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                  </div> -->
-
-                        <!-- <div class="form-group">
-                    <label for="exampleInputFile">File input</label>
-                    <input type="file" id="exampleInputFile">
-  
-                    <p class="help-block">Example block-level help text here.</p>
-                  </div> -->
-
-                        <!-- <div class="checkbox">
-                    <label>
-                      <input type="checkbox"> Check me out
-                    </label>
-                  </div> -->
 
                     </div>
                     <!-- /.box-body -->
 
                     <div class="box-footer">
-                        <button type="submit" class="btn btn-primary">Generate PDF</button>
-                        <button type="button" class="btn btn-success">Download</button>
+                        <button type="submit" class="btn btn-success">Download</button>
+                        <!-- <button type="button" class="btn btn-primary">Show PDF</button> -->
                     </div>
                 </form>
             </div>
@@ -77,9 +54,7 @@
             <div class="box box-success mt-4">
                 <div class="box-body">
                     <h2>Uploaded PDF:</h2>
-                    <!-- <embed src="{{ url_for('uploaded_file', filename=filename) }}" width="800px" height="600px"/> -->
-                    <iframe src="{{ url_for('uploaded_file', filename=filename) }}" width="800px" height="600px"
-                        frameborder="0"></iframe>
+                    <iframe src="/uploads/{{ filename }}" width="800px" height="600px" frameborder="0"></iframe>
                 </div>
             </div>
             {% else %}
@@ -92,13 +67,17 @@
                             <input type="file" name="file">
                             <p class="help-block">Example block-level help text here.</p>
                         </div>
-                        <!-- <input type="submit" value="Upload"> -->
                     </div>
                     <div class="box-footer">
                         <button type="submit" class="btn btn-primary">Generate PDF</button>
                     </div>
                 </div>
             </form>
+            <!-- <div class="box box-success">
+                <div class="box-body">
+                    <div style="width: auto; min-height: 500px;"></div>
+                </div>
+            </div> -->
             {% endif %}
         </div>
     </div>
