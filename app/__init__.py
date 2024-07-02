@@ -8,6 +8,16 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
 
+    app.config.from_object('app.config.Config')
+
+    with app.app_context():
+        # Import parts of our application
+        from .mysql import db
+        from . import routes
+
+        # Create database connection
+        db.init_db()
+
     # Load
     app.secret_key = os.environ.get('SECRET_KEY')
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
