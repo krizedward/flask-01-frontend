@@ -1,0 +1,69 @@
+<!-- pdf-raport.html -->
+{% extends "skeleton/adminlte.html" %}
+
+{% block title %}Accounting - Prepare{% endblock %}
+
+{% block breadcrumb %}
+<section class="content-header">
+    <h1>
+        Accounting
+        <small>form pages</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Accounting</li>
+    </ol>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <!-- column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <div class="box-title">
+                        <h2>Accounting</h2>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table id="commissionTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Username</th>
+                                <th>Emails</th>
+                                <th colspan="2" style="text-align: center; width: 10%;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be displayed here -->
+                            {% for user in users %}
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <a href="/accounting/{{ user.id }}/edit" class="btn btn-warning stretched-link">
+                                            Edit
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="/accounting/{{ user.id }}/delete" class="btn btn-danger stretched-link">
+                                            Hapus
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
+{% endblock %}

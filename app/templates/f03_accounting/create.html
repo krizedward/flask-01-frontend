@@ -1,0 +1,63 @@
+<!-- create.html -->
+{% extends "skeleton/adminlte.html" %}
+{% block title %}Create - Commission{% endblock %}
+
+{% block breadcrumb %}
+<section class="content-header">
+    <h1>
+        Accounting
+        <small>create pages</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Create</li>
+    </ol>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <!-- column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-success">
+
+                <!-- form start -->
+                <form action="/accounting/create" role="form" method="POST">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label>username</label>
+                            <input name="username" type="text" class="form-control"
+                                placeholder="username">
+                        </div>
+
+                        <div class="form-group">
+                            <label>email</label>
+                            <input name="email" type="email" class="form-control"
+                                placeholder="email">
+                        </div>
+
+                        <!-- <div class="form-group">
+                            <label>commission note</label>
+                            <input name="commission_note" type="text" class="form-control"
+                                placeholder="commission note">
+                        </div> -->
+
+                    </div>
+                    <!-- /.box-body -->
+
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.box -->
+        </div>
+        <!--/.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+{% endblock %}

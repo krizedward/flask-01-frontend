@@ -35,4 +35,7 @@ def create_app():
     from .f02_pdf import f02_pdf as pdf_blueprint
     app.register_blueprint(pdf_blueprint)
 
+    from .f03_accounting import f03_accounting as accounting_blueprint
+    app.register_blueprint(accounting_blueprint)
+
     return app
