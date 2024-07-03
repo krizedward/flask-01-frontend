@@ -34,8 +34,9 @@
                         <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>Username</th>
-                                <th>Emails</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Deskripsi</th>
                                 <th colspan="2" style="text-align: center; width: 10%;">Aksi</th>
                             </tr>
                         </thead>
@@ -44,8 +45,9 @@
                             {% for user in users %}
                                 <tr>
                                     <td>{{ user.id }}</td>
-                                    <td>{{ user.username }}</td>
-                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.transaction_date }}</td>
+                                    <td>{{ user.transaction_amount }}</td>
+                                    <td>{{ user.transaction_description }}</td>
                                     <td>
                                         <a href="/accounting/{{ user.id }}/edit" class="btn btn-warning stretched-link">
                                             Edit
