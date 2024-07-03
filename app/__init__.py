@@ -38,4 +38,7 @@ def create_app():
     from .f03_accounting import f03_accounting as accounting_blueprint
     app.register_blueprint(accounting_blueprint)
 
+    from .f04_inventory import f04_inventory as inventory_blueprint
+    app.register_blueprint(inventory_blueprint)
+
     return app
