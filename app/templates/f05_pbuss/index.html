@@ -1,0 +1,81 @@
+<!-- pdf.html -->
+{% extends "skeleton/adminlte.html" %}
+
+{% block title %}PBUSS{% endblock %}
+
+{% block breadcrumb %}
+<section class="content-header">
+    <h1>
+        PENERIMA BANTUAN UANG SEKOLAH SISWA
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">PBUSS</li>
+    </ol>
+</section>
+{% endblock %}
+
+
+{% block content %}
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <!-- column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <div class="box-title"></div>
+                </div>
+                <div class="box-body">
+                    <table id="commissionTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>no_buss</th>
+                                <th>kode</th>
+                                <th>nama</th>
+                                <th>link</th>
+                                <th>sekolah</th>
+                                <th>us</th>
+                                <th>buss</th>
+                                <th>us_buss</th>
+                                <th>nomor_surat_sekolah</th>
+                                <th colspan="2" style="text-align: center; width: 10%;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be displayed here -->
+                            {% for user in users %}
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.no_buss }}</td>
+                                    <td>{{ user.kode }}</td>
+                                    <td>{{ user.nama }}</td>
+                                    <td>{{ user.link }}</td>
+                                    <td>{{ user.sekolah }}</td>
+                                    <td>{{ user.us }}</td>
+                                    <td>{{ user.buss }}</td>
+                                    <td>{{ user.us_buss }}</td>
+                                    <td>{{ user.nomor_surat_sekolah }}</td>
+                                    <td>
+                                        <a href="/accounting/{{ user.id }}/edit" class="btn btn-warning stretched-link">
+                                            Edit
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="/accounting/{{ user.id }}/delete" class="btn btn-danger stretched-link">
+                                            Hapus
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
+{% endblock %}

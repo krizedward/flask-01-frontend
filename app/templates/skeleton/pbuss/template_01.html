@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ data.title }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #555;
+        }
+        p {
+            line-height: 1.5;
+        }
+        .content {
+            margin-top: 20px;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ data.title }}</h1>
+    </header>
+    <main class="content">
+        <p>
+            Nomor	:{{ data.nomor_surat_sekolah }} <br>
+            Hal	    :Persetujuan Bantuan Uang Sekolah Siswa
+		            Bagi Siswa yang Tidak Mampu Secara Ekonomi <br>
+        </p>
+        <p>
+            Yang terhormat <br>
+            Bapak/Ibu (link nama orang tua) <br>
+            Jalan (link alamat) <br>
+            Surabaya/Sidoarjo (link alamat) <br>
+        </p>
+
+        <p>
+            Dengan hormat, <br>
+
+            Menunjuk surat Dewan Pengurus PPPK Petra nomor: {{ data.nomor_surat_sekolah }} tanggal 14 Juni 2024 tentang <br>
+            Persetujuan Bantuan Uang Sekolah Siswa Bagi yang Tidak Mampu, maka dengan ini memberitahukan bahwa <br> 
+            kami dapat mengabulkan permohonan bantuan uang sekolah untuk anak Bapak/Ibu, <br><br>
+
+                Nama	:  	{{ data.nama }} <br>
+                Sekolah	:   {{ data.sekolah }} <br>			
+                Kelas/No. Absen	:    	{-- (link dengan kelas dan nomor absen)} <br>			
+                Mendapat bantuan	:    	nominal BUSS dalam Rp. {{ data.buss }} <br><br>	
+
+            Bantuan uang sekolah berlaku Juli 2024 sampai Juni 2025 <br>
+            Uang sekolah Juli 2024 - Juni 2025 menjadi Rp {{ data.us_buss}} <br><br>
+
+
+            Atas perhatian dan kerja sama Bapak/Ibu, kami ucapkan terima kasih. <br>
+
+
+            Hormat kami,
+                Panitia Bantuan Uang Sekolah Siswa PPPK Petra
+        </p>
+
+    </main>
+    <footer class="footer">
+        <p>&copy; 2024 Your Company</p>
+    </footer>
+</body>
+</html>

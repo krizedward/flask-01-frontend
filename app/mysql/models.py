@@ -187,3 +187,21 @@ def delete_data_inventorys(get_id):
         print(f"Error: {e}")
     finally:
         cursor.close()
+
+# pbuss
+
+def get_data_pbuss():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM pbuss')
+    data = cursor.fetchall()
+    cursor.close()
+    return data
+
+def get_pbuss_by_kode(get_kode):
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM pbuss WHERE kode = %s', (get_kode,))
+    data = cursor.fetchone()
+    cursor.close()
+    return data

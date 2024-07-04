@@ -41,4 +41,7 @@ def create_app():
     from .f04_inventory import f04_inventory as inventory_blueprint
     app.register_blueprint(inventory_blueprint)
 
+    from .f05_pbuss import f05_pbuss as pbuss_blueprint
+    app.register_blueprint(pbuss_blueprint)
+
     return app
