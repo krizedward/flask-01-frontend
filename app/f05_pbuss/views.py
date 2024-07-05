@@ -13,6 +13,7 @@ from . import f05_pbuss
 
 import locale
 from datetime import datetime
+import zipfile
 
 # Set locale to Indonesian (ID) for example
 locale.setlocale(locale.LC_ALL, 'id_ID')
@@ -85,19 +86,15 @@ def upload_raport(kode):
 
             # Read the existing PDF
             existing_pdf = PdfReader(file)
-            output = PdfWriter()
+            output1 = PdfWriter()
+            output2 = PdfWriter()  # Assuming you want to generate two PDFs
 
-            # kode = 2021071337
             pbuss_data = get_pbuss_by_kode(kode)
-            # pbuss_data = get_pbuss_by_kode(2021071337)
 
             # Convert to string if needed (assuming 'id' is an integer)
-            id = str(pbuss_data['id'])
             nomor_surat_sekolah = str(pbuss_data['nomor_surat_sekolah'])
             nama = str(pbuss_data['nama'])
             sekolah = str(pbuss_data['sekolah'])
-            # buss = str(pbuss_data['buss'])
-            # us_buss = str(pbuss_data['us_buss'])
 
             formatted_buss = locale.format_string('%d', pbuss_data['buss'], grouping=True).replace(',', '.')
             formatted_us_buss = locale.format_string('%d', pbuss_data['us_buss'], grouping=True).replace(',', '.')
@@ -112,11 +109,16 @@ def upload_raport(kode):
             # can.drawString(170, 725, id)
             can.drawString(93, 667, nomor_surat_sekolah)
             can.drawString(485, 667, tanggal_sekarang)
+            can.drawString(63, 587, 'Bapak asd') # new_data
+            can.drawString(63, 567, 'DARMO INDAH SELATAN HH NO 34, SURABAYA') # new_data
             can.drawString(54, 489, 'Menunjuk surat Dewan Pengurus PPPK Petra nomor: ' + nomor_surat_sekolah)
+            can.drawString(130, 450, 'Bapak asd') # new_data
             can.drawString(185, 434, nama)
             can.drawString(185, 419, sekolah)
+            can.drawString(185, 405, 'XIA') # new_data
             can.drawString(313, 392, 'Rp.' + formatted_buss)
             can.drawString(248, 354, 'Rp.' + formatted_us_buss)
+            can.drawString(180, 333, 'Bapak asd, kami ucapkan terima kasih') # new_data
             can.save()
 
             # Move to the beginning of the BytesIO buffer
@@ -128,20 +130,107 @@ def upload_raport(kode):
                 page = existing_pdf.pages[page_num]
                 if page_num == 0:  # Add new content only to the first page
                     page.merge_page(new_pdf.pages[0])
-                output.add_page(page)
+                output1.add_page(page)
+                output2.add_page(page)
 
-            # Ensure the upload directory exists
-            upload_folder = os.path.join(app.root_path, 'static', 'uploads')
-            if not os.path.exists(upload_folder):
-                os.makedirs(upload_folder)
+            # Create BytesIO buffers to store the final PDFs
+            final_output1 = BytesIO()
+            output1.write(final_output1)
+            final_output1.seek(0)
 
-            # Save the result
-            temp_file_path = os.path.join(upload_folder, filename)
-            with open(temp_file_path, 'wb') as f:
-                output.write(f)
+            final_output2 = BytesIO()
+            output2.write(final_output2)
+            final_output2.seek(0)
 
-            # Send the file back to the user for download
-            return send_file(temp_file_path, as_attachment=True, download_name=filename)
+            # Create a new filename for the PDFs
+            new_filename1 = f"PBUSS_1.pdf"
+            new_filename2 = f"PBUSS_2.pdf"
+
+            # Create a BytesIO buffer for the zip file
+            zip_buffer = BytesIO()
+            with zipfile.ZipFile(zip_buffer, 'w') as z:
+                z.writestr(new_filename1, final_output1.getvalue())
+                z.writestr(new_filename2, final_output2.getvalue())
+
+            # Spool back to the beginning of the BytesIO buffer
+            zip_buffer.seek(0)
+
+            # Send the zip file back to the user
+            return send_file(zip_buffer, as_attachment=True, download_name=f"PBUSS_{nomor_surat_sekolah}.zip")
 
     return 'Gagal mengunggah file.', 400
 
+@f05_pbuss.route('/download-all-pbuss', methods=['GET'])
+# def download_all_pbuss():
+#     pbuss_data = get_data_pbuss()
+#     return jsonify(pbuss_data)
+def download_all_pbuss():
+    pbuss_data = get_data_pbuss()
+    
+    # Group data by school
+    data_by_school = {}
+    for data in pbuss_data:
+        school = data['sekolah']
+        if school not in data_by_school:
+            data_by_school[school] = []
+        data_by_school[school].append(data)
+    
+    # Create a BytesIO buffer for the zip file
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, 'w') as z:
+        for school, data_list in data_by_school.items():
+            for data in data_list:
+                # Create a new PDF for each entry
+                packet = BytesIO()
+                can = canvas.Canvas(packet, pagesize=letter)
+                can.setFont("Helvetica", 11)
+                
+                nomor_surat_sekolah = str(data['nomor_surat_sekolah'])
+                nama = str(data['nama'])
+                formatted_buss = locale.format_string('%d', data['buss'], grouping=True).replace(',', '.')
+                formatted_us_buss = locale.format_string('%d', data['us_buss'], grouping=True).replace(',', '.')
+                tanggal_sekarang = datetime.now().strftime('%d %B %Y')
+
+                can.drawString(93, 667, nomor_surat_sekolah)
+                can.drawString(485, 667, tanggal_sekarang)
+                can.drawString(61, 488, 'Menunjuk surat Dewan Pengurus PPPK Petra no : ' + nomor_surat_sekolah)
+                can.drawString(185, 434, nama)
+                can.drawString(185, 419, data['nama_sekolah'])
+                # can.drawString(185, 417, data['nama_kelas'])
+                can.drawString(313, 392, 'Rp.' + formatted_buss)
+                can.drawString(248, 354, 'Rp.' + formatted_us_buss)
+                can.save()
+
+                packet.seek(0)
+                new_pdf = PdfReader(packet)
+
+                # Load the template PDF from the static folder
+                template_path = os.path.join(app.root_path, 'static', 'template_pbuss.pdf')
+                existing_pdf = PdfReader(open(template_path, 'rb'))
+                output = PdfWriter()
+
+                # Merge the new content with the template on the first page
+                page = existing_pdf.pages[0]
+                page.merge_page(new_pdf.pages[0])
+                output.add_page(page)
+
+                # Add the remaining pages of the template if any
+                for page_num in range(1, len(existing_pdf.pages)):
+                    output.add_page(existing_pdf.pages[page_num])
+
+                # Create BytesIO buffer to store the final PDF
+                final_output = BytesIO()
+                output.write(final_output)
+                final_output.seek(0)
+
+                # Create a new filename for the PDF
+                new_filename = f"{school}/PBUSS_{nama}.pdf"
+
+                # Add the PDF to the zip file in the respective school folder
+                z.writestr(new_filename, final_output.getvalue())
+
+    # Spool back to the beginning of the BytesIO buffer
+    zip_buffer.seek(0)
+
+    # Send the zip file back to the user
+    return send_file(zip_buffer, as_attachment=True, download_name="PBUSS_PPPK_PETRA_2024.zip")

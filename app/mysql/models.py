@@ -193,7 +193,17 @@ def delete_data_inventorys(get_id):
 def get_data_pbuss():
     db = get_db()
     cursor = db.cursor(dictionary=True)
-    cursor.execute('SELECT * FROM pbuss')
+    select_query = """
+    SELECT 
+        pbuss.*,
+        skh.nama_sekolah AS nama_sekolah,
+        edu.kelas AS nama_kelas
+    FROM pbuss
+    JOIN education edu ON pbuss.kode = edu.kode
+    JOIN sekolah skh ON edu.sekolah = skh.kode_sekolah
+    """
+    cursor.execute(select_query)
+    # cursor.execute('SELECT * FROM pbuss')
     data = cursor.fetchall()
     cursor.close()
     return data
