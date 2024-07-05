@@ -205,6 +205,7 @@ def download_all_pbuss():
                 can = canvas.Canvas(packet, pagesize=letter)
                 can.setFont("Helvetica", 11)
                 
+                kode = str(data['kode'])
                 nomor_surat_sekolah = str(data['nomor_surat_sekolah'])
                 nama = str(data['nama'])
                 formatted_buss = locale.format_string('%d', data['buss'], grouping=True).replace(',', '.')
@@ -249,7 +250,7 @@ def download_all_pbuss():
                 final_output.seek(0)
 
                 # Create a new filename for the PDF
-                new_filename = f"{school}/PBUSS_{nama}.pdf"
+                new_filename = f"{school}/PBUSS_{kode}.pdf"
 
                 # Add the PDF to the zip file in the respective school folder
                 z.writestr(new_filename, final_output.getvalue())
