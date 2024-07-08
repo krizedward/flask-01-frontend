@@ -194,7 +194,7 @@ def get_data_pbuss():
     db = get_db()
     cursor = db.cursor(dictionary=True)
     select_query = """
-    SELECT * FROM pbuss_baru_1
+    SELECT * FROM pbuss_baru
     """
     cursor.execute(select_query)
     # cursor.execute('SELECT * FROM pbuss')

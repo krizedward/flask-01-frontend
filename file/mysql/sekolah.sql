@@ -39,7 +39,7 @@ CREATE TABLE `sekolah` (
 
 INSERT INTO `sekolah` (`id`, `kode_sekolah`, `nama_sekolah`) VALUES
 (1, 'D01', 'SD Kristen Petra 1'),
-(2, 'D05', 'SD Kristen Petra 1'),
+(2, 'D05', 'SD Kristen Petra 5'),
 (3, 'D07', 'SD Kristen Petra 7'),
 (4, 'D09', 'SD Kristen Petra 9'),
 (5, 'D10', 'SD Kristen Petra 10'),

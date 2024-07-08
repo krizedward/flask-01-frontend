@@ -1,0 +1,154 @@
+<!-- pdf.html -->
+{% extends "skeleton/adminlte.html" %}
+
+{% block title %}PBUSS{% endblock %}
+
+{% block breadcrumb %}
+<section class="content-header">
+    <h1>
+        Penerima Bantuan Uang Sekolah Siswa
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">PBUSS</li>
+    </ol>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <!-- column -->
+        <div class="col-md-12">
+            <!-- general form elements -->
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <div class="box-title">
+                        <select id="data1_length" class="form-control input-sm" onchange="changeTableLength()">
+                            <option value="5">05</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+                    </div>
+
+                    <div class="box-tools" style="margin-top: 5px;">
+                        <ul class="pagination pagination-sm no-margin pull-right">
+                            <li><a href="#" onclick="GeneratePdf()">Generate PDF</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table id="commissionTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>no buss</th>
+                                <th>kode</th>
+                                <th>nama</th>
+                                <th>sekolah</th>
+                                <th>us</th>
+                                <th>buss</th>
+                                <th>us buss</th>
+                                <th>nomor surat sekolah</th>
+                                <th colspan="2" style="text-align: center; width: 10%;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be displayed here -->
+                            {% for dt in data %}
+                            <tr>
+                                <td>{{ dt.id }}</td>
+                                <td>{{ dt.no_buss }}</td>
+                                <td>{{ dt.kode }}</td>
+                                <td>{{ dt.nama }}</td>
+                                <td>{{ dt.nama_sekolah }}</td>
+                                <td>{{ dt.us }}</td>
+                                <td>{{ dt.buss }}</td>
+                                <td>{{ dt.us_buss }}</td>
+                                <td>{{ dt.nomor_surat_sekolah }}</td>
+                                <td>
+                                    <a href="/accounting/{{ dt.id }}/edit" class="btn btn-warning stretched-link">
+                                        Edit
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="/accounting/{{ dt.id }}/delete" class="btn btn-danger stretched-link">
+                                        Hapus
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="box-footer clearfix">
+                    <ul class="pagination pagination-sm no-margin pull-right">
+                        <li><a href="#" id="previousPage">Previous</a></li>
+                        <!-- <li><a href="#" class="pageNumber">1</a></li>
+                        <li><a href="#" class="pageNumber">2</a></li>
+                        <li><a href="#" class="pageNumber">3</a></li> -->
+                        <li><a href="#" id="nextPage">Next</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- /.content -->
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+    const GeneratePdf = function() {
+        // Show loading alert using SweetAlert
+        Swal.fire({
+            title: 'Loading...',
+            html: 'Preparing download. Please wait...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        // Fetch download URL from Flask route
+        fetch('/download-all-pbuss')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                // Hide loading alert
+                // Swal.close();
+                // Create a temporary link element to trigger the download
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'PBUSS_PPPK_PETRA_2024.zip';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                // Show finished alert
+                Swal.fire({
+                    title: 'Finished!',
+                    type: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Failed to download. Please try again later.'
+                });
+            });
+    };
+</script>
+{% endblock %}

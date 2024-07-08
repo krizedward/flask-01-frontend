@@ -24,6 +24,12 @@ locale.setlocale(locale.LC_ALL, 'id_ID')
 # config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
 # index
+@f05_pbuss.route('/pbuss', methods=['GET'])
+def pbuss_index():
+    # return 'index'
+    data = get_data_pbuss()
+    return render_template('f05_pbuss/table.html', data = data)
+
 @f05_pbuss.route('/pdf/<kode>', methods=['GET'])
 def index_pbuss(kode):
     pbuss_data = get_pbuss_by_kode(kode)
