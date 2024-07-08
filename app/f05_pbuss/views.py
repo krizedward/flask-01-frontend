@@ -186,7 +186,7 @@ def upload_raport(kode):
 #     return jsonify(pbuss_data)
 def download_all_pbuss():
     pbuss_data = get_data_pbuss()
-    
+    # return jsonify(pbuss_data)
     # Group data by school
     data_by_school = {}
     for data in pbuss_data:
@@ -210,21 +210,23 @@ def download_all_pbuss():
                 nama = str(data['nama'])
                 formatted_buss = locale.format_string('%d', data['buss'], grouping=True).replace(',', '.')
                 formatted_us_buss = locale.format_string('%d', data['us_buss'], grouping=True).replace(',', '.')
-                tanggal_sekarang = datetime.now().strftime('%d %B %Y')
+                # tanggal_sekarang = datetime.now().strftime('%d %B %Y')
+                tanggal_sekarang = '16 Juni 2024'
 
                 can.drawString(93, 667, nomor_surat_sekolah)
                 can.drawString(485, 667, tanggal_sekarang)
-                can.drawString(51, 583.5, 'Bapak/Ibu') # new_data
-                can.drawString(51, 568, 'DARMO INDAH SELATAN HH NO 34, SURABAYA') # new_data
+                can.drawString(51, 583.5, data['ortu_murid'] + ' ' + (data['nama_ortu'] if data['nama_ortu'] is not None else ''))
+                can.drawString(51, 568, data['almt'] if data['almt'] is not None else '') # Handling None value
                 can.drawString(61, 488, 'Menunjuk surat Dewan Pengurus PPPK Petra no : ' + nomor_surat_sekolah)
-                can.drawString(337, 460.5, 'Bapak/Ibu,') # new_data
+                can.drawString(338, 460.5, data['ortu_murid'] + ',') # Assuming 'ortu_murid' is always present
+                # can.drawString(338, 460.5, data['ortu_murid'] + ' ' + (data['nama_ortu'] if data['nama_ortu'] is not None else '') + ',') # Assuming 'ortu_murid' is always present
                 can.drawString(185, 434, nama)
                 can.drawString(185, 419, data['nama_sekolah'])
-                can.drawString(185, 405, data['nama_kelas']) # new_data
-                # can.drawString(185, 417, data['nama_kelas'])
-                can.drawString(313, 392, 'Rp.' + formatted_buss)
+                can.drawString(185, 405, data['nama_kelas'] if data['nama_kelas'] is not None else '') # Handling None value
+                can.drawString(185, 392, 'Rp.' + formatted_buss)
+                # can.drawString(313, 392, 'Rp.' + formatted_buss)
                 can.drawString(248, 354, 'Rp.' + formatted_us_buss)
-                can.drawString(188, 326.5, 'Bapak/Ibu, kami ucapkan terima kasih.') # new_data
+                can.drawString(188, 326.5, data['ortu_murid'] + ', kami ucapkan terima kasih.') # Assuming 'ortu_murid' is always present
                 can.save()
 
                 packet.seek(0)
@@ -250,7 +252,7 @@ def download_all_pbuss():
                 final_output.seek(0)
 
                 # Create a new filename for the PDF
-                new_filename = f"{school}/PBUSS_{kode}.pdf"
+                new_filename = f"{school}/{kode}.pdf"
 
                 # Add the PDF to the zip file in the respective school folder
                 z.writestr(new_filename, final_output.getvalue())
@@ -260,3 +262,104 @@ def download_all_pbuss():
 
     # Send the zip file back to the user
     return send_file(zip_buffer, as_attachment=True, download_name="PBUSS_PPPK_PETRA_2024.zip")
+
+@f05_pbuss.route('/download-all-pbuss-one-pdf', methods=['GET'])
+# def download_all_pbuss():
+#     pbuss_data = get_data_pbuss()
+#     return jsonify(pbuss_data)
+def download_all_pbuss_one_pdf():
+    pbuss_data = get_data_pbuss()
+    
+    # Group data by school
+    data_by_school = {}
+    for data in pbuss_data:
+        school = data['sekolah']
+        if school not in data_by_school:
+            data_by_school[school] = []
+        data_by_school[school].append(data)
+    
+    # Create a BytesIO buffer for the final PDF
+    final_output = BytesIO()
+    output = PdfWriter()
+    
+    for school, data_list in data_by_school.items():
+        for data in data_list:
+            # Create a new PDF for each entry
+            packet = BytesIO()
+            can = canvas.Canvas(packet, pagesize=letter)
+            can.setFont("Helvetica", 11)
+            
+            kode = str(data['kode'])
+            nomor_surat_sekolah = str(data['nomor_surat_sekolah'])
+            nama = str(data['nama'])
+            formatted_buss = locale.format_string('%d', data['buss'], grouping=True).replace(',', '.')
+            formatted_us_buss = locale.format_string('%d', data['us_buss'], grouping=True).replace(',', '.')
+            # tanggal_sekarang = datetime.now().strftime('%d %B %Y')
+            tanggal_sekarang = '16 Juni 2024'
+
+            can.drawString(93, 667, nomor_surat_sekolah)
+            can.drawString(485, 667, tanggal_sekarang)
+            can.drawString(51, 583.5, data['ortu_murid'] + ' ' + (data['nama_ortu'] if data['nama_ortu'] is not None else ''))
+            can.drawString(51, 568, data['almt'] if data['almt'] is not None else '') # Handling None value
+            can.drawString(61, 488, 'Menunjuk surat Dewan Pengurus PPPK Petra no : ' + nomor_surat_sekolah)
+            can.drawString(338, 460.5, data['ortu_murid'] + ',') # Assuming 'ortu_murid' is always present
+            # can.drawString(338, 460.5, data['ortu_murid'] + ' ' + (data['nama_ortu'] if data['nama_ortu'] is not None else '') + ',') # Assuming 'ortu_murid' is always present
+            can.drawString(185, 434, nama)
+            can.drawString(185, 419, data['nama_sekolah'])
+            can.drawString(185, 405, data['nama_kelas'] if data['nama_kelas'] is not None else '') # Handling None value
+            can.drawString(185, 392, 'Rp.' + formatted_buss)
+            can.drawString(248, 354, 'Rp.' + formatted_us_buss)
+            can.drawString(188, 326.5, data['ortu_murid'] + ', kami ucapkan terima kasih.') # Assuming 'ortu_murid' is always present
+            can.save()
+
+            packet.seek(0)
+            new_pdf = PdfReader(packet)
+
+            # Load the template PDF from the static folder
+            # template_path = os.path.join(os.getcwd(), 'static', 'template_pbuss.pdf')
+            # existing_pdf = PdfReader(open(template_path, 'rb'))
+
+            # Load the template PDF from the static folder
+            template_path = os.path.join(app.root_path, 'static', 'template_pbuss.pdf')
+            existing_pdf = PdfReader(open(template_path, 'rb'))
+            
+            # Merge the new content with the template on the first page
+            page = existing_pdf.pages[0]
+            page.merge_page(new_pdf.pages[0])
+            output.add_page(page)
+
+            # Add the remaining pages of the template if any
+            for page_num in range(1, len(existing_pdf.pages)):
+                output.add_page(existing_pdf.pages[page_num])
+
+    # Save the final PDF to the buffer
+    output.write(final_output)
+    final_output.seek(0)
+
+    # Send the PDF file back to the user
+    return send_file(final_output, as_attachment=True, download_name="PBUSS_PPPK_PETRA_2024")
+
+@f05_pbuss.route('/contoh', methods=['GET'])
+def download_zip():
+    # Menggunakan BytesIO untuk menyimpan data ZIP di dalam memori
+    zip_buffer = BytesIO()
+
+    # Membuat objek zipfile.ZipFile untuk menulis data ke zip_buffer
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED, False) as z:
+        # Contoh data yang akan dimasukkan ke dalam file ZIP
+        file_data = b"Contoh data yang akan dimasukkan ke dalam file ZIP"
+        
+        # Menambahkan file ke dalam ZIP dengan nama file 'contoh.txt'
+        z.writestr('contoh.txt', file_data)
+
+        # Jika Anda memiliki lebih dari satu file, dapat menambahkan file lainnya seperti ini:
+        # z.writestr('contoh2.txt', b"Isi dari file kedua dalam ZIP")
+
+    # Setelah selesai menulis data ke dalam zip_buffer, pindah ke awal buffer
+    zip_buffer.seek(0)
+
+    # Membuat respons HTTP dengan file ZIP sebagai attachment
+    # response = make_response(send_file(zip_buffer, mimetype='application/zip', as_attachment=True, attachment_filename='example.zip'))
+    return send_file(zip_buffer, as_attachment=True, download_name=f"PBUSS.zip")
+    
+    # return response

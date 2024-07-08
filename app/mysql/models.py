@@ -194,13 +194,55 @@ def get_data_pbuss():
     db = get_db()
     cursor = db.cursor(dictionary=True)
     select_query = """
+    SELECT * FROM pbuss_baru_1
+    """
+    cursor.execute(select_query)
+    # cursor.execute('SELECT * FROM pbuss')
+    data = cursor.fetchall()
+    cursor.close()
+    return data
+
+def get_data_pbuss_old():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    select_query = """
     SELECT 
-        pbuss.*,
+        pbuss.id,
+        pbuss.buss,
+        pbuss.nama,
+        pbuss.no_buss,
+        pbuss.nomor_surat_sekolah,
+        pbuss.sekolah,
+        pbuss.us,
+        pbuss.us_buss,
+        pbuss.kode,
         skh.nama_sekolah AS nama_sekolah,
-        edu.kelas AS nama_kelas
+        edu.kelas AS nama_kelas,
+        CASE 
+            WHEN kpd.orang_tua = 'Ayah' THEN cnt_alamat_ayah.alamat
+            WHEN kpd.orang_tua = 'Ibu' THEN cnt_alamat_ibu.alamat
+            WHEN kpd.orang_tua = 'Wali' THEN cnt_alamat_wali.alamat
+        END AS almt,
+        CASE 
+            WHEN kpd.orang_tua = 'Ayah' THEN 'Bapak'
+            WHEN kpd.orang_tua = 'Ibu' THEN 'Ibu'
+            WHEN kpd.orang_tua = 'Wali' THEN 'Bapak/Ibu'
+        END AS ortu_murid,
+        CASE 
+            WHEN kpd.orang_tua = 'Ayah' THEN cnt_ayah.nama
+            WHEN kpd.orang_tua = 'Ibu' THEN cnt_ibu.nama
+            WHEN kpd.orang_tua = 'Wali' THEN cnt_wali.nama
+        END AS nama_ortu
     FROM pbuss
     JOIN education edu ON pbuss.kode = edu.kode
     JOIN sekolah skh ON edu.sekolah = skh.kode_sekolah
+    JOIN kepada kpd ON kpd.no_buss = pbuss.no_buss
+    LEFT JOIN contact cnt_alamat_ayah ON cnt_alamat_ayah.kode = pbuss.kode AND cnt_alamat_ayah.ortu = 'Ayah'
+    LEFT JOIN contact cnt_alamat_ibu ON cnt_alamat_ibu.kode = pbuss.kode AND cnt_alamat_ibu.ortu = 'Ibu'
+    LEFT JOIN contact cnt_alamat_wali ON cnt_alamat_wali.kode = pbuss.kode AND cnt_alamat_wali.ortu = 'Wali'
+    LEFT JOIN contact cnt_ayah ON cnt_ayah.kode = pbuss.kode AND cnt_ayah.ortu = 'Ayah'
+    LEFT JOIN contact cnt_ibu ON cnt_ibu.kode = pbuss.kode AND cnt_ibu.ortu = 'Ibu'
+    LEFT JOIN contact cnt_wali ON cnt_wali.kode = pbuss.kode AND cnt_wali.ortu = 'Wali'
     """
     cursor.execute(select_query)
     # cursor.execute('SELECT * FROM pbuss')
