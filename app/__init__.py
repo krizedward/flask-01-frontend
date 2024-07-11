@@ -44,4 +44,10 @@ def create_app():
     from .f05_pbuss import f05_pbuss as pbuss_blueprint
     app.register_blueprint(pbuss_blueprint)
 
+    from .f06_student import f06_student as student_blueprint
+    app.register_blueprint(student_blueprint)
+
+    from .f07_booking import f07_booking as booking_blueprint
+    app.register_blueprint(booking_blueprint)
+
     return app

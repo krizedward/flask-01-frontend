@@ -257,3 +257,13 @@ def get_pbuss_by_kode(get_kode):
     data = cursor.fetchone()
     cursor.close()
     return data
+
+# student
+
+def get_data_student():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM student')
+    users = cursor.fetchall()
+    cursor.close()
+    return users
