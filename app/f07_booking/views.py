@@ -28,16 +28,29 @@ def show():
     if request.method == 'GET':
         # Example data array (replace this with actual data fetching logic)
         data = [
-            {"ruangan": "Room A", "jam": "10:00 AM", "peminjam": "John Doe"},
-            {"ruangan": "Room B", "jam": "11:00 AM", "peminjam": "Jane Smith"},
-            {"ruangan": "Room C", "jam": "12:00 PM", "peminjam": "Alice Johnson"},
-            {"ruangan": "Room D", "jam": "01:00 PM", "peminjam": "Bob Brown"},
-            {"ruangan": "Room E", "jam": "02:00 PM", "peminjam": "Charlie Davis"},
-            {"ruangan": "Room F", "jam": "03:00 PM", "peminjam": "Eve Miller"},
-            {"ruangan": "Room G", "jam": "04:00 PM", "peminjam": "Frank Wilson"},
-            {"ruangan": "Room H", "jam": "05:00 PM", "peminjam": "Grace Lee"},
-            {"ruangan": "Room I", "jam": "06:00 PM", "peminjam": "Henry Clark"},
-            {"ruangan": "Room J", "jam": "07:00 PM", "peminjam": "Ivy Lewis"}
+            {"ruangan": "Room A", "jam": "7:30 AM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room B", "jam": "08:00 AM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room C", "jam": "08:30 AM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room D", "jam": "09:30 AM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room E", "jam": "10:00 AM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room F", "jam": "10:30 AM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room G", "jam": "11:00 AM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room H", "jam": "11:30 AM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room I", "jam": "12:00 AM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room J", "jam": "12:30 PM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room J", "jam": "01:00 PM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room J", "jam": "01:30 PM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room J", "jam": "02:00 PM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room J", "jam": "02:30 PM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room J", "jam": "03:00 PM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room J", "jam": "03:30 PM", "peminjam": "Pak Edward"},
+            {"ruangan": "Room J", "jam": "04:00 PM", "peminjam": "Pak Edward"},
         ]
 
         return render_template('f07_booking/show.html', data=data)
+
+# profile
+@f07_booking.route('/booking/profile', methods=['GET'])
+def profile():
+    if request.method == 'GET':
+        return render_template('f07_booking/profile.html')
