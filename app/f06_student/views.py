@@ -1,12 +1,12 @@
 from flask import render_template, jsonify, session, request, redirect, flash
 import requests
 from . import f06_student
-from ..mysql.models import get_data_student
+# from ..mysql.models import get_data_student
 
 # index
 @f06_student.route('/student', methods=['GET'])
 def index_student():
-    data = get_data_student()
+    # data = get_data_student()
     return render_template('f06_student/index.html', data = data)
 
 

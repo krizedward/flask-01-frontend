@@ -49,5 +49,8 @@ def create_app():
 
     from .f07_booking import f07_booking as booking_blueprint
     app.register_blueprint(booking_blueprint)
+    
+    from .f08_qrcode import f08_qrcode as qrcode_blueprint
+    app.register_blueprint(qrcode_blueprint)
 
     return app
